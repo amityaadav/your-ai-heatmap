@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Knowledge Survey — Amit Yadav</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDF0F4;
+    --paper-2:#F7F9FB;
+    --ink:#0F131B;
+    --ink-2:#3D4756;
+    --ink-3:#6B7789;
+    --rule:#C8CFD9;
+
+    --L1:#C2382B;   /* haven't touched */
+    --L2:#F0A99E;   /* heard of / asked about */
+    --L3:#8ECB92;   /* can explain to peers */
+    --L4:#1C6B3C;   /* can teach / have built */
+
+    --L1-ink:#FFFFFF;
+    --L2-ink:#5C1B12;
+    --L3-ink:#12351A;
+    --L4-ink:#EAF6EE;
+
+    --display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+    --body:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:15px;
+    line-height:1.55;
+    padding:clamp(20px,4vw,56px) clamp(16px,4vw,56px) 80px;
+  }
+
+  .shell{max-width:1560px;margin:0 auto}
+
+  /* ---------- masthead ---------- */
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 18px;
+    border-bottom:1px solid var(--rule);
+    padding-bottom:10px;
+    margin-bottom:22px;
+  }
+  h1{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:clamp(30px,5.2vw,58px);
+    line-height:1.02;
+    letter-spacing:-0.028em;
+    margin:0 0 14px;
+    max-width:19ch;
+  }
+  h1 em{font-style:normal;color:var(--L1)}
+  .standfirst{
+    max-width:60ch;
+    color:var(--ink-2);
+    font-size:clamp(15px,1.5vw,17px);
+    margin:0 0 30px;
+  }
+
+  /* ---------- signature: spectrum ribbon ---------- */
+  .ribbon-block{margin:0 0 12px}
+  .ribbon-label{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.15em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    margin-bottom:8px;
+  }
+  .ribbon{
+    display:flex;
+    height:64px;
+    width:100%;
+    border:1px solid var(--ink);
+    overflow:hidden;
+  }
+  .ribbon-seg{
+    display:flex;
+    align-items:flex-end;
+    padding:8px 10px;
+    position:relative;
+    transition:flex-grow .5s cubic-bezier(.4,0,.2,1);
+    min-width:0;
+  }
+  .ribbon-seg + .ribbon-seg{border-left:1px solid var(--ink)}
+  .ribbon-seg b{
+    font-family:var(--display);
+    font-size:clamp(18px,2.6vw,30px);
+    font-weight:700;
+    line-height:1;
+    letter-spacing:-.03em;
+  }
+  .ribbon-seg span{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    margin-left:7px;
+    padding-bottom:2px;
+    opacity:.85;
+    white-space:nowrap;
+    overflow:hidden;
+  }
+
+  /* ---------- legend / filter ---------- */
+  .legend{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--ink);
+    border:1px solid var(--ink);
+    margin-bottom:38px;
+  }
+  .legend button{
+    all:unset;
+    cursor:pointer;
+    background:var(--paper-2);
+    padding:11px 13px 13px;
+    display:block;
+    min-width:0;
+    transition:background .16s;
+  }
+  .legend button:hover{background:#fff}
+  .legend button:focus-visible{outline:2px solid var(--ink);outline-offset:-4px}
+  .legend .sw{
+    display:flex;align-items:center;gap:8px;
+    font-family:var(--mono);
+    font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--ink-3);
+    margin-bottom:5px;
+  }
+  .legend .chip{width:14px;height:14px;border:1px solid var(--ink);flex:0 0 auto}
+  .legend .desc{
+    font-size:12.5px;line-height:1.35;color:var(--ink-2);
+    display:block;
+  }
+  .legend button[aria-pressed="true"]{background:var(--ink);}
+  .legend button[aria-pressed="true"] .sw,
+  .legend button[aria-pressed="true"] .desc{color:var(--paper)}
+  .legend button[aria-pressed="true"] .chip{border-color:var(--paper)}
+
+  /* ---------- layout ---------- */
+  .grid-wrap{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 320px;
+    gap:clamp(20px,3vw,44px);
+    align-items:start;
+  }
+
+  /* ---------- domain rows ---------- */
+  .domain{
+    border-top:1px solid var(--ink);
+    padding:16px 0 24px;
+  }
+  .domain-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .domain-head h2{
+    font-family:var(--display);
+    font-size:17px;
+    font-weight:700;
+    letter-spacing:-.012em;
+    margin:0;
+  }
+  .domain-note{
+    font-size:12.5px;
+    color:var(--ink-3);
+    margin:0;
+    flex:1 1 240px;
+    min-width:0;
+  }
+  .microbar{
+    display:flex;
+    height:9px;
+    width:132px;
+    flex:0 0 auto;
+    border:1px solid var(--ink);
+  }
+  .microbar i{display:block}
+
+  .cells{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(154px,1fr));
+    gap:4px;
+  }
+  .cell{
+    all:unset;
+    cursor:pointer;
+    display:block;
+    padding:9px 10px 10px;
+    min-height:56px;
+    font-family:var(--mono);
+    font-size:11.5px;
+    line-height:1.28;
+    letter-spacing:-.005em;
+    border:1px solid rgba(15,19,27,.28);
+    transition:transform .13s ease, box-shadow .13s ease, opacity .2s ease;
+    position:relative;
+  }
+  .cell:hover{transform:translateY(-2px);box-shadow:0 4px 0 0 var(--ink);z-index:2}
+  .cell:focus-visible{outline:2px solid var(--ink);outline-offset:2px;z-index:3}
+  .cell[data-lvl="1"]{background:var(--L1);color:var(--L1-ink)}
+  .cell[data-lvl="2"]{background:var(--L2);color:var(--L2-ink)}
+  .cell[data-lvl="3"]{background:var(--L3);color:var(--L3-ink)}
+  .cell[data-lvl="4"]{background:var(--L4);color:var(--L4-ink)}
+  .cell .lvl{
+    position:absolute;top:6px;right:7px;
+    font-size:9px;opacity:.55;font-weight:600;
+  }
+  .cell.dim{opacity:.14;pointer-events:none}
+  .cell.sel{box-shadow:0 0 0 3px var(--ink)}
+
+  /* ---------- detail rail ---------- */
+  .rail{
+    position:sticky;
+    top:24px;
+    border:1px solid var(--ink);
+    background:var(--paper-2);
+    padding:18px 18px 20px;
+  }
+  .rail .k{
+    font-family:var(--mono);
+    font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink-3);
+    margin-bottom:10px;
+  }
+  .rail h3{
+    font-family:var(--display);
+    font-size:20px;font-weight:700;letter-spacing:-.02em;
+    margin:0 0 4px;line-height:1.14;
+  }
+  .rail .band{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    border:1px solid var(--ink);padding:3px 8px;margin:8px 0 14px;
+  }
+  .rail .band i{width:10px;height:10px;display:block}
+  .rail .why{font-size:13.5px;line-height:1.5;color:var(--ink-2);margin:0 0 14px}
+  .rail .ev{
+    font-family:var(--mono);font-size:11px;line-height:1.5;
+    color:var(--ink-3);border-top:1px solid var(--rule);padding-top:11px;margin:0;
+  }
+  .rail .ev b{color:var(--ink-2);font-weight:600}
+
+  /* ---------- closing ---------- */
+  .method{
+    border-top:1px solid var(--ink);
+    margin-top:40px;padding-top:22px;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:26px;
+  }
+  .method h4{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--ink-3);margin:0 0 8px;font-weight:500;
+  }
+  .method p{margin:0;font-size:13px;line-height:1.55;color:var(--ink-2)}
+
+  @media (max-width:1080px){
+    .grid-wrap{grid-template-columns:minmax(0,1fr)}
+    .rail{
+      position:fixed;left:0;right:0;bottom:0;top:auto;
+      border-left:0;border-right:0;border-bottom:0;
+      z-index:40;
+      transform:translateY(101%);
+      transition:transform .22s cubic-bezier(.4,0,.2,1);
+      max-height:64vh;overflow:auto;
+      box-shadow:0 -10px 30px rgba(15,19,27,.16);
+    }
+    .rail.open{transform:translateY(0)}
+    .rail-close{
+      all:unset;cursor:pointer;position:absolute;top:12px;right:14px;
+      font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+      text-transform:uppercase;color:var(--ink-3);
+    }
+  }
+  @media (min-width:1081px){ .rail-close{display:none} }
+  @media (max-width:560px){
+    .legend{grid-template-columns:repeat(2,1fr)}
+    .cells{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <div class="eyebrow">
+    <span>Knowledge survey</span>
+    <span>Amit Yadav</span>
+    <span>Compiled 03 Aug 2026</span>
+    <span id="n-topics">— topics</span>
+    <span>Source: conversation history, 2025–2026</span>
+  </div>
+
+  <h1>What you know about AI, and <em>where the map goes dark</em>.</h1>
+  <p class="standfirst">
+    Every topic the field is actively working on right now, scored against evidence of what you've
+    actually said, asked, built, debugged, or taught. Click any cell for the reasoning behind its score.
+    Click a legend swatch to isolate one band.
+  </p>
+
+  <div class="ribbon-block">
+    <div class="ribbon-label">Overall distribution — width is proportional to topic count</div>
+    <div class="ribbon" id="ribbon" role="img" aria-label="Distribution of topics across the four knowledge levels"></div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="grid-wrap">
+    <main id="matrix"></main>
+
+    <aside class="rail" id="rail" aria-live="polite">
+      <button class="rail-close" id="railClose">Close ✕</button>
+      <div class="k">Selected topic</div>
+      <h3 id="r-title">Pick a cell</h3>
+      <div class="band" id="r-band" hidden><i></i><span></span></div>
+      <p class="why" id="r-why">Every square carries the specific reason it landed where it did — what you built, what you only asked about, and what has never come up at all.</p>
+      <p class="ev" id="r-ev"></p>
+    </aside>
+  </div>
+
+  <div class="method">
+    <div>
+      <h4>How this was scored</h4>
+      <p>Evidence-based, not self-reported. A topic only reaches dark green with a shipped artifact, a debugging session that went past the surface, or a session where you taught it to someone else. Light green means you've reasoned about it correctly in conversation. Light red means it appeared but you were the one asking. Red means it has never come up.</p>
+    </div>
+    <div>
+      <h4>The known bias</h4>
+      <p>This maps what you brought to <em>these</em> conversations. Work you did silently — at TRP, in Claude Code sessions outside this history, or in reading you never asked about — is invisible here and will be scored too low. Treat red cells in your own domain as prompts to correct the record, not as verdicts.</p>
+    </div>
+    <div>
+      <h4>Reading breadth vs depth</h4>
+      <p>Breadth is how much of the board is not red. Depth is how much is dark green. A wide band of light green with few dark cells is the signature of someone who reads and explains faster than they build — the fix is fewer new topics, more finished ones.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const LV = {
+  1:{name:"Untouched",       desc:"Hasn't come up at all",              css:"--L1"},
+  2:{name:"Heard of it",     desc:"Briefly encountered or asked about", css:"--L2"},
+  3:{name:"Can explain",     desc:"Solid enough to teach a peer",       css:"--L3"},
+  4:{name:"Can teach / built",desc:"Built with it or taught it",        css:"--L4"}
+};
+
+const DOMAINS = [
+  {
+    d:"Foundations & model internals",
+    note:"Strong for a non-ML-engineer — the NVIDIA labs did real work here.",
+    t:[
+      ["Neural network fundamentals",4,"You didn't stop at 'the loss went down.' You asked what 23.89 signified mathematically and worked through softmax → negative log likelihood. Then you built a visualizer that teaches it to others.","Built: NVIDIA-Deep-Learning-labs digit visualizer · 4-layer PyTorch net with animated activations"],
+      ["CNNs & convolution",4,"Full transfer-learning lab: frozen VGG16 feature extractor, custom head, then unfreezing. You diagnosed catastrophic forgetting from the learning rate yourself.","NVIDIA DLI certification · Conv2d parameter semantics · coached Swati through the same lab"],
+      ["Backprop & gradients",3,"Correct on exploding gradients and clipping. Conceptually clean, but you've never implemented a training loop from scratch.","Quiz-level fluency · used utils.py training loops rather than writing them"],
+      ["Transformer architecture",3,"You can lay out the stack for an audience. It's taught knowledge, not derived knowledge.","Used in BA curriculum · answered advanced-round questions correctly"],
+      ["Attention & multi-head attention",3,"You correctly identified that multi-head runs parallel projections capturing different relationship types. That's a real answer, not a guess.","Advanced quiz round, five correct in a row"],
+      ["Tokens & tokenization",4,"Core of your restaurant-analogy glossary. You've explained this to thirty people who'd never heard of it.","BA curriculum · comic strip series"],
+      ["Context windows",4,"Same — taught, and you reason about it when picking models and sizing prompts.","BA curriculum · model selection conversations"],
+      ["Embeddings & vector space",3,"The knowledge-graph vs embeddings conversation showed you actually understand what a 1,536-dim space does and doesn't buy you.","Taught in glossary · applied to incident-triage design"],
+      ["Pretraining & next-token prediction",3,"You've walked others through the pipeline from raw corpus to instruction-following assistant.","AI timeline conversation"],
+      ["RLHF & alignment training",2,"You've had it explained and can repeat the reward-model → RL loop. You've never touched DPO, constitutional methods, or the tradeoffs.","One conversation, receiving rather than reasoning"],
+      ["Sampling params (temperature, top-p)",3,"Basic operational fluency; flagged as too basic for your own comic strips.","Considered and rejected as a teaching topic"],
+      ["Hallucination & grounding",3,"Your chosen next comic topic. You frame it well for a business audience.","Teaching pipeline"],
+      ["Reasoning models & chain-of-thought",3,"You prompt with it and teach it. The current research on test-time compute and CoT structure hasn't come up.","Curriculum module 3"],
+      ["Mixture of Experts",2,"Appeared as a line item when you were comparing open models for local inference. No architectural depth.","Model landscape research"],
+      ["Quantization (INT4/INT8/GGUF)",2,"You understand it as a VRAM lever — 2GB per billion params, Q4 to fit a 34B. Not as a quality/latency tradeoff you've measured.","Local hardware research"],
+      ["Scaling laws & their limits",2,"Encountered in trend reading. Chinchilla, sub-Chinchilla returns, the compute wall — surface only.","AI trends conversation"],
+      ["Open weights & model licensing",3,"You did real work here — leaderboard by SWE-bench, open models as a price-floor hedge. That's an informed position.","Local inference economics study for TRP"],
+      ["Model distillation",2,"Named in passing while comparing model families.","Model landscape research"]
+    ]
+  },
+  {
+    d:"Training & model adaptation",
+    note:"Transfer learning is genuinely strong; the LLM-adaptation half is nearly blank.",
+    t:[
+      ["Transfer learning",4,"Freeze, train, unfreeze, drop the LR, watch for forgetting. You've done the full cycle and taught it.","VGG16 fruit classifier · diagnosed 1e-4 → 1e-6 fix"],
+      ["Loss functions",3,"You drew the CrossEntropy vs BCEWithLogits distinction precisely — mutual exclusivity, shape contracts, internal softmax vs sigmoid.","Lab 7 debugging"],
+      ["Overfitting & regularization",3,"You spotted 97% train / 84% val as overfitting and applied dropout.","Lab 7"],
+      ["Data augmentation",3,"Configured the transforms and understood why validation doesn't shuffle.","Lab 7"],
+      ["Hyperparameter tuning",3,"Learning-rate intuition specifically. Not systematic search.","Lab 7"],
+      ["LLM fine-tuning (SFT)",2,"Discussed as one of three options against RAG and prompting. Never run.","Comic strip topic candidate"],
+      ["LoRA / QLoRA / PEFT",2,"Appears in your hardware research as a thing a 3090 can do. That's the whole extent.","GPU build research"],
+      ["Synthetic data generation",2,"Listed in your LLM-capabilities framework. No hands-on.","Training deck framework"],
+      ["Dataset curation & labeling",1,"Never discussed. You've only used pre-packaged datasets.",""],
+      ["Distributed & large-scale training",1,"Never discussed.",""],
+      ["Reward modeling & RL post-training",1,"Never discussed beyond the RLHF summary.",""],
+      ["Continual learning",1,"Never discussed. Currently one of the loudest 2026 research threads.",""]
+    ]
+  },
+  {
+    d:"Retrieval & knowledge systems",
+    note:"You explain RAG better than most people who've built it — but you haven't built it.",
+    t:[
+      ["RAG fundamentals",3,"You teach it and correctly position it against fine-tuning and prompting. You also questioned whether building one was worth it given managed services — a good instinct that has kept you from building one.","Curriculum · Bedrock Knowledge Bases conversation"],
+      ["Knowledge graphs & GraphRAG",3,"Your best conceptual conversation in this space. You understood why nearest-neighbour search can't answer 'what upstream services could cause this symptom' and why that pushes toward graph traversal.","Applied directly to incident-triage POC design"],
+      ["Chunking strategies",2,"Named as the hard problem. You've never tuned one against a retrieval metric.","Conceptual only"],
+      ["Vector databases",2,"Chroma, FAISS, Pinecone, OpenSearch named. None stood up.","Research only"],
+      ["Embedding model selection",2,"Mentioned as a lever. No comparison run.","Research only"],
+      ["Hybrid search & reranking",2,"Appeared in reading on 2026 RAG practice.","Trends reading"],
+      ["Retrieval quality evaluation",1,"This is the specific gap the fluency assessment called out — 'engineered context assembly with retrieval quality measurement.' Still untouched.","Named as a gap, not closed"],
+      ["Managed RAG (Bedrock KB)",2,"Researched the build-vs-buy tradeoff. No Bedrock sandbox access to try it.","Blocked by access, not interest"],
+      ["Document parsing & extraction",2,"Listed in your capability framework.","Framework only"],
+      ["Memory & episodic state design",2,"AgentCore Memory covered in the full-day training. Nothing built on it.","Bedrock AgentCore training"]
+    ]
+  },
+  {
+    d:"Agents & orchestration",
+    note:"Your strongest technical territory. MCP in particular is genuine teaching depth.",
+    t:[
+      ["MCP protocol & primitives",4,"You've authored servers across stdio and HTTP transports, built a Splunk MCP server at a hackathon, walked through all seven primitives, and correctly argued that an MCP server needs no underlying API. You teach this.","Splunk MCP · SQLite PoC · CLI project · MCP Inspector debugging"],
+      ["LangGraph",4,"Shipped a production multi-agent system on it and can articulate state merging, fan-out/fan-in, reflection loops, and conditional routing without notes.","Celestial newsletter on Lambda · incident-triage POC"],
+      ["Agent architecture patterns",3,"Plan/act loops, reflection, critique-driven routing — you designed with these rather than just naming them.","Celestial system design"],
+      ["Multi-agent orchestration",3,"Three parallel research agents shipped. But parallel multi-agent execution at scale was flagged as a gap, and the six-agent expense system was n8n, not code.","Shipped small, not large"],
+      ["Tool use & function calling",3,"Central to everything you've built. Solid, unremarkable.","Across all agent work"],
+      ["LangChain",3,"Actively working through structured tutorials in a local venv, lesson by lesson. In progress, not finished.","Current learning track"],
+      ["Agentic coding tools",3,"Heavy daily driver across Claude Code and Kiro — steering files, spec mode, auto-running test suites before deploy.","To-do kanban project · incident-triage POC"],
+      ["Claude Code advanced features",2,"Hooks, subagents, headless mode, checkpointing, Agent SDK — you identified all of them as your highest-leverage gaps and then didn't close them. Scored 2/5 on native features despite topping the MCP-authoring axis.","Explicitly named gap, June audit"],
+      ["Bedrock AgentCore",2,"Full-day training. Runtime, Memory, Gateway, Identity, Observability — and a sharp Gateway-to-Apigee analogy. Zero hands-on, sandbox blocked.","Training attended, access denied"],
+      ["Strands Agents SDK",2,"Understood as model-driven orchestration vs LangGraph's explicit graphs. Never run — this is your company's standard, which makes it the most expensive gap on this board.","Conceptual only"],
+      ["No-code agent platforms",3,"Built a six-agent expense tracking system in n8n end to end.","Shipped"],
+      ["Human-in-the-loop design",3,"You argue for review gates on risky actions and understand why bounded tasks beat open-ended chat.","Trends conversation, applied thinking"],
+      ["Agent identity & permission scoping",2,"You've named agent identity sprawl as a threat. You haven't designed a scoping model.","AMA security prep"],
+      ["Agent-to-agent protocols",1,"A2A and the coordination-protocol layer haven't come up.",""],
+      ["Long-horizon task execution",2,"Read about 8-hour agent workflows. Your own agents run in minutes.","Trends reading"]
+    ]
+  },
+  {
+    d:"Context & interaction engineering",
+    note:"Teaching-grade on the prompting side; the engineering discipline underneath is thinner.",
+    t:[
+      ["Prompt engineering",4,"You designed a six-module curriculum for thirty BAs, built the mental model (briefing a context-blind collaborator), ran a pre-session poll, and the comic landed. This is unambiguously teaching depth.","Delivered to 30 BAs · comic strip series"],
+      ["Few-shot & CoT prompting",4,"Module 3 of your own curriculum, with BA-specific applications.","Curriculum"],
+      ["System prompt & role design",3,"You use it deliberately and teach RCTFC-style structure.","Curriculum"],
+      ["Context engineering",3,"You correctly see it as the successor framing to prompt engineering and picked it as a comic topic. The measured version — assembling context and proving it improved things — isn't there.","Named topic, unmeasured practice"],
+      ["Prompt libraries & reuse",3,"Actively building a living library tied to real TRP artifacts. That's the right instinct and it's in flight.","In progress at TRP"],
+      ["Structured outputs & schema validation",2,"Called out as a gap: structured output validation with repair loops. Still open.","Named gap"],
+      ["Prompt versioning as tested artifacts",2,"Same assessment, same status. Treating prompts as code you regression-test hasn't started.","Named gap"],
+      ["Prompt caching & cost optimisation",2,"You reason about token cost at the model-selection level, not the cache level.","Adjacent knowledge"]
+    ]
+  },
+  {
+    d:"Evaluation & reliability",
+    note:"The single widest gap on this board, and you already know it.",
+    t:[
+      ["Eval fundamentals & golden datasets",2,"You researched the courses thoroughly — Hamel and Shreya's Maven cohort, the DeepLearning.AI/Arize option — and identified this as the top gap. Research is not the same as having run one.","Gap identified July 2026, unclosed"],
+      ["LLM-as-judge",2,"You listed it as a capability in your teaching framework. Never implemented.","Framework only"],
+      ["Trace-level observability for agents",2,"Named as a gap: 'every run leaves an inspectable trace.' Your agents don't yet.","Named gap"],
+      ["Error analysis & failure taxonomies",2,"You know the method — group failure modes, fix what matters first. Untried.","Course research"],
+      ["Regression testing for agents",2,"You built auto-running test suites for deterministic code, which is real. Non-deterministic agent output is a different problem you haven't tackled.","Adjacent skill, not transferred"],
+      ["Benchmarks (SWE-bench, agentic evals)",3,"You built a model leaderboard by SWE-bench score as part of the TCO work — you can explain what these measure and where they mislead.","Local inference study"],
+      ["Cost & latency benchmarking",3,"Three-year TCO across hardware tiers, ending in a model-routing recommendation rather than a hardware buy. That's a defensible piece of analysis.","TRP local inference study"],
+      ["Guardrails & output filtering",2,"Named in your framework and in the security conversations. Nothing implemented.","Conceptual"],
+      ["Classical NLP metrics (BLEU/COMET)",2,"One conversation covering BLEU, METEOR, chrF, BERTScore, COMET, MQM. You received it rather than applied it.","Single conversation"],
+      ["Uncertainty & calibration",1,"Never discussed.",""]
+    ]
+  },
+  {
+    d:"Security, safety & governance",
+    note:"Genuinely good threat-model intuition, entirely unvalidated by hands-on testing.",
+    t:[
+      ["Prompt injection (direct & indirect)",3,"Your best security thinking. You landed on the point that internal agents are more exposed to indirect injection precisely because they ingest trusted internal documents — and you got there partly by arguing against yourself.","AMA prep · red-team agent concept"],
+      ["Entitlement flattening in RAG",3,"You raised this specifically. Most people building RAG have never considered it.","AMA prep"],
+      ["Shadow AI & agent inventory",3,"You designed a discovery layer for finding undeclared agent deployments. Strong instinct for where the real risk sits.","Agent Security Evaluator concept"],
+      ["Deepfake & social engineering threats",3,"Covered as the inbound half of the AI threat picture.","AMA prep"],
+      ["Agent red-teaming in practice",2,"You know Garak, PyRIT, Lakera, Mindgard exist and what they do. You've run none of them.","Market research"],
+      ["OWASP LLM Top 10 / MITRE ATLAS",2,"Named as the mapping targets for your compliance layer. Not worked through.","Concept design"],
+      ["AI regulation — financial services",3,"FINRA's 2026 oversight report, SEC exam priorities, the 40%/44% adoption-vs-validation gap. You cite real numbers, which is rare.","Applied to TRP context repeatedly"],
+      ["AI governance frameworks (NIST, ISO 42001)",2,"AIGP identified as your accessible next certification. Frameworks not yet studied.","Certification research"],
+      ["EU AI Act & global policy",1,"Hasn't come up. Notable given TRP's global footprint.",""],
+      ["Model safety & alignment research",2,"You engage with it as context, not as a field you track.","Trends reading"],
+      ["Mechanistic interpretability",1,"Never discussed. SAEs, activation steering, Anthropic's natural-language autoencoder work — all absent.",""],
+      ["Privacy & PII handling in AI systems",2,"Present in your compliance reasoning but never designed for concretely.","Adjacent"],
+      ["Supply chain risk (MCP servers, deps)",3,"You flagged MCP servers as a supply-chain surface — and you're one of the few people who authors them, so you know what you're describing.","AMA prep"]
+    ]
+  },
+  {
+    d:"Infrastructure, serving & LLMOps",
+    note:"Your AWS depth is real and shipped. The LLM-specific ops layer above it is not.",
+    t:[
+      ["AWS core (IAM, Lambda, ECS/Fargate, SQS)",4,"SpecSync is a real deployed system — multi-environment stacks, queue-driven Fargate services, the whole shape.","SpecSync · celestial newsletter on Lambda"],
+      ["Infrastructure as code (CDK)",4,"Python CDK with L3 constructs, parameterised per-environment config, artifact promotion from stage to prod.","SpecSync multi-env stacks"],
+      ["CI/CD pipelines",3,"GitHub Actions with OIDC federation, GitLab CI mechanics, immutable git-SHA image tags, manual approval gates.","Celestial · SpecSync"],
+      ["Docker & containers",3,"You reasoned your own way to the right answer — the value is dependency consistency and an immutable versioned artifact, not cloud portability — and then built a teaching poster from it.","VM/Docker/K8s poster · Fargate deployments"],
+      ["Kubernetes",2,"Correct mental model (orchestration layer above containers, doesn't replace Docker) but deliberately deprioritised and never run.","Poster only, by your own sequencing"],
+      ["Local inference (Ollama, LM Studio)",3,"Running locally on the M5, and you debugged a real one — Metal shader / bfloat16 incompatibility, fixed by pinning Ollama 0.18.0.","M5 MacBook, hands-on debugging"],
+      ["High-throughput serving (vLLM)",2,"Named as the production-serving tier in your research. Not run.","Research"],
+      ["GPU hardware & VRAM economics",3,"VRAM-per-parameter rules, PCIe bottlenecks on dual 3090s, NVLink limits, TOPS comparisons across cards. Well-researched.","Desktop build study"],
+      ["Model routing architecture",3,"Your own conclusion from the TCO work, and the right one — route across tiers rather than own hardware.","TRP local inference study"],
+      ["Cost management & AI FinOps",3,"You run projects at roughly fifty cents a month and know why. You switched to Haiku for cost reasons deliberately.","Celestial · Hermes work"],
+      ["Observability (Splunk, CloudWatch)",3,"Splunk MCP server, a CloudWatch analysis agent, Splunk query design over 24h/30d windows in the triage POC.","Multiple projects"],
+      ["API gateway patterns",3,"You mapped AgentCore Gateway onto TRP's existing Apigee layer unprompted — that's the architect move.","AgentCore training"],
+      ["LLMOps platforms & model registry",1,"Never discussed. No model versioning, promotion, or registry practice.",""],
+      ["Feature stores & ML pipelines",1,"Never discussed.",""],
+      ["Edge & on-device inference",2,"Noted that Gemma 4 12B runs in 16GB with vision and voice. Interest, not practice.","Trends reading"]
+    ]
+  },
+  {
+    d:"Modalities beyond text",
+    note:"Vision is real via the NVIDIA track. Audio and generative media are sketches.",
+    t:[
+      ["Image classification & vision",3,"MNIST end to end in the browser, plus the VGG16 fruit classifier. The best lesson you drew was about train/serve skew — replicating the preprocessing pipeline exactly.","Digit visualizer · DLI labs"],
+      ["NLP & named entity recognition",3,"Covered in the DLI coursework.","NVIDIA DLI NLP/NER labs"],
+      ["Speech-to-text",2,"You scaffolded a whisper.cpp pipeline with VAD-gated mic capture. Designed, not run.","voice_twin.py scaffold"],
+      ["Text-to-speech & voice cloning",2,"StyleTTS2 / XTTS-v2 chosen, sentence-boundary streaming designed to hide latency. Same status — scaffolded.","voice_twin.py scaffold"],
+      ["Vision-language models",2,"Qwen3-VL, Llama 3.2 Vision named in model research.","Research"],
+      ["Multimodal architecture",2,"You teach 'vision encoders fused with LLMs' as a line in a table. That's the depth.","Curriculum table"],
+      ["Diffusion & image generation",2,"One row in one comparison table. Nothing beyond it.","Passing mention"],
+      ["Video generation",1,"Never discussed beyond naming Sora once.",""],
+      ["OCR & document AI",2,"Receipt scanning was an agent in the expense concept, but the OCR itself was never the subject.","Adjacent"],
+      ["Audio & music generation",1,"Never discussed.",""]
+    ]
+  },
+  {
+    d:"Frontier & research directions",
+    note:"Almost entirely dark. Defensible for a practitioner — until you're in a room with researchers.",
+    t:[
+      ["Test-time compute & reasoning scaling",2,"Encountered in trends reading.","Trends"],
+      ["World models & JEPA",1,"Never discussed. Over $2B has moved into this thesis in six months.",""],
+      ["Physical AI & robotics",2,"Named as where new capital is going. No engagement.","Trends"],
+      ["Neuro-symbolic & hybrid AI",2,"Your knowledge-graph-plus-embeddings reasoning is the applied edge of this, though you didn't name it as such.","Implicit"],
+      ["Federated learning",1,"Never discussed.",""],
+      ["Green AI & energy constraints",2,"You engaged with the power-not-capital argument — interconnection queues, capacity slipping to 2028.","Trends conversation"],
+      ["AI economics & compute markets",3,"The TCO study plus the capex/power reading gives you a genuine position on where cost pressure comes from.","TRP study · trends"],
+      ["Agentic RL & training environments",1,"Never discussed. This is where a lot of 2026 capability work sits.",""],
+      ["Self-improving & recursive systems",1,"Never discussed.",""],
+      ["AGI timelines & macro forecasting",2,"Peripheral awareness only.","Trends"]
+    ]
+  },
+  {
+    d:"Applied AI & organisational practice",
+    note:"Your actual moat. Nobody on your engineering side scores here.",
+    t:[
+      ["AI adoption strategy",4,"Tools-first sequencing for BAs — Jira/Confluence agents, then Copilot, then the proprietary LLM interface — with measurement of behaviour change rather than licence counts. That's a real strategy.","30-BA programme at TRP"],
+      ["AI education & curriculum design",4,"Six-module curriculum, pre-session polling, weekly comics, and the self-awareness to notice the MCP session was too technical and diagnose it as a sequencing and curse-of-knowledge problem.","Delivered, iterated, corrected"],
+      ["Use case identification & prioritisation",4,"The regulatory-change-impact and data-lineage agent ideas were good precisely because you know which processes matter — an engineer couldn't have picked them.","Enterprise agent ideation"],
+      ["Requirements to architecture translation",4,"This is the BA-to-architect bridge you're actively walking, with steering files and test plans as the mechanism.","POC practice at TRP"],
+      ["AI in asset management",4,"ETF NAV/price mechanics, AP arbitrage, EMEA market structure, identifier hierarchy, return metrics. Deep, and it's the context everything else attaches to.","Domain work"],
+      ["Change management & measuring adoption",3,"You're pushing toward time studies and adoption metrics as evidence. Not yet produced.","In progress"],
+      ["Build vs buy evaluation",3,"You questioned whether to build RAG given managed services, and whether to own hardware given routing. You ask the right question consistently.","Repeated pattern"],
+      ["Stakeholder communication & buy-in",3,"You prepare for rooms — the AMA questions were built to be non-dodgeable, and you thought about political dynamics before content.","AMA prep · Nagendra 1:1"],
+      ["Explaining AI to non-technical audiences",4,"The restaurant analogy, the dating-trust analogy for the panel, the comic strips. This is a distinct skill and you have it.","Multiple formats, real audiences"],
+      ["Portfolio & career positioning",3,"Deliberate about it — projects as evidence, honest about 'shipped agents at scale' being the gap.","Ongoing"]
+    ]
+  },
+  {
+    d:"Classical ML, data & engineering craft",
+    note:"The pre-LLM half of the field is your thinnest area outside frontier research.",
+    t:[
+      ["Python",3,"Shipping real code after a fifteen-year gap. Reading and debugging faster than writing from scratch, and honest about that.","Active daily practice"],
+      ["Git & version control",3,"Reset, restore, checkout from remote, commit conventions — working fluency.","Daily"],
+      ["SQL & data modelling",3,"Career-long BA competence.","Professional background"],
+      ["Supervised learning basics",3,"Covered properly through DLI.","NVIDIA DLI"],
+      ["Unsupervised learning & clustering",2,"Mentioned as an embedding use case. Never practised.","Adjacent"],
+      ["Statistical inference & experiment design",2,"You reason about metrics but haven't designed a controlled experiment. Directly relevant to proving your adoption programme worked.","Gap with immediate business value"],
+      ["Time series forecasting",1,"Never discussed — surprising given asset management.",""],
+      ["Recommender systems",1,"Never discussed.",""],
+      ["Feature engineering",1,"Never discussed.",""],
+      ["Data engineering pipelines",2,"SpecSync syncs artifacts rather than moving data at volume. Not the same discipline.","Adjacent"],
+      ["Explainable AI (SHAP, LIME)",1,"Never discussed. Relevant to a regulated firm.",""],
+      ["Frontend & data visualisation",3,"The digit visualizer, the posters, the interactive frameworks. You build things people can look at.","Multiple artifacts"]
+    ]
+  }
+];
+
+/* ---------- build ---------- */
+const matrix = document.getElementById('matrix');
+const counts = {1:0,2:0,3:0,4:0};
+let total = 0;
+
+DOMAINS.forEach((dom, di)=>{
+  const local = {1:0,2:0,3:0,4:0};
+  dom.t.forEach(t=>{ local[t[1]]++; counts[t[1]]++; total++; });
+
+  const sec = document.createElement('section');
+  sec.className = 'domain';
+
+  const head = document.createElement('div');
+  head.className = 'domain-head';
+  head.innerHTML = `<h2>${dom.d}</h2><p class="domain-note">${dom.note}</p>`;
+
+  const mb = document.createElement('div');
+  mb.className = 'microbar';
+  mb.setAttribute('role','img');
+  mb.setAttribute('aria-label',
+    `${dom.t.length} topics: ${local[4]} built or taught, ${local[3]} can explain, ${local[2]} heard of, ${local[1]} untouched`);
+  [4,3,2,1].forEach(l=>{
+    if(!local[l]) return;
+    const i = document.createElement('i');
+    i.style.flex = local[l];
+    i.style.background = `var(${LV[l].css})`;
+    mb.appendChild(i);
+  });
+  head.appendChild(mb);
+  sec.appendChild(head);
+
+  const cells = document.createElement('div');
+  cells.className = 'cells';
+  dom.t.forEach(([name,lvl,why,ev])=>{
+    const b = document.createElement('button');
+    b.className = 'cell';
+    b.dataset.lvl = lvl;
+    b.innerHTML = `<span class="lvl">${lvl}</span>${name}`;
+    b.setAttribute('aria-label', `${name} — level ${lvl}, ${LV[lvl].name}`);
+    b.addEventListener('click', ()=>select(b,name,lvl,why,ev,dom.d));
+    b.addEventListener('mouseenter', ()=>{ if(window.innerWidth>1080) show(name,lvl,why,ev,dom.d); });
+    cells.appendChild(b);
+  });
+  sec.appendChild(cells);
+  matrix.appendChild(sec);
+});
+
+document.getElementById('n-topics').textContent = `${total} topics`;
+
+/* ribbon */
+const ribbon = document.getElementById('ribbon');
+[4,3,2,1].forEach(l=>{
+  const seg = document.createElement('div');
+  seg.className = 'ribbon-seg';
+  seg.style.flexGrow = counts[l];
+  seg.style.background = `var(${LV[l].css})`;
+  seg.style.color = `var(${LV[l].css}-ink)`;
+  const pct = Math.round(counts[l]/total*100);
+  seg.innerHTML = `<b>${counts[l]}</b><span>${LV[l].name} · ${pct}%</span>`;
+  ribbon.appendChild(seg);
+});
+/* explicit ink colours (CSS vars for ink are separate names) */
+[...ribbon.children].forEach((seg,i)=>{
+  const l = [4,3,2,1][i];
+  seg.style.color = getComputedStyle(document.documentElement).getPropertyValue(`--L${l}-ink`);
+});
+
+/* legend + filter */
+const legend = document.getElementById('legend');
+let activeFilter = null;
+[1,2,3,4].forEach(l=>{
+  const b = document.createElement('button');
+  b.setAttribute('aria-pressed','false');
+  b.innerHTML = `<span class="sw"><i class="chip" style="background:var(${LV[l].css})"></i>${l} · ${LV[l].name}</span><span class="desc">${LV[l].desc} — ${counts[l]} topics</span>`;
+  b.addEventListener('click', ()=>{
+    activeFilter = (activeFilter===l) ? null : l;
+    [...legend.children].forEach((x,i)=>x.setAttribute('aria-pressed', String(activeFilter===i+1)));
+    document.querySelectorAll('.cell').forEach(c=>{
+      c.classList.toggle('dim', activeFilter!==null && +c.dataset.lvl!==activeFilter);
+    });
+  });
+  legend.appendChild(b);
+});
+
+/* detail rail */
+const rail = document.getElementById('rail');
+const rTitle = document.getElementById('r-title');
+const rBand  = document.getElementById('r-band');
+const rWhy   = document.getElementById('r-why');
+const rEv    = document.getElementById('r-ev');
+
+function show(name,lvl,why,ev,dom){
+  rTitle.textContent = name;
+  rBand.hidden = false;
+  rBand.querySelector('i').style.background = `var(${LV[lvl].css})`;
+  rBand.querySelector('span').textContent = `${lvl} · ${LV[lvl].name}`;
+  rWhy.textContent = why;
+  rEv.innerHTML = ev ? `<b>Evidence</b> — ${ev}<br><b>Domain</b> — ${dom}` : `<b>Evidence</b> — none in the record.<br><b>Domain</b> — ${dom}`;
+}
+function select(btn,name,lvl,why,ev,dom){
+  document.querySelectorAll('.cell.sel').forEach(c=>c.classList.remove('sel'));
+  btn.classList.add('sel');
+  show(name,lvl,why,ev,dom);
+  if(window.innerWidth<=1080) rail.classList.add('open');
+}
+document.getElementById('railClose').addEventListener('click',()=>rail.classList.remove('open'));
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') rail.classList.remove('open'); });
+</script>
+</body>
+</html>
