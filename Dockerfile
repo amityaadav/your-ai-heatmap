@@ -1,13 +1,7 @@
-FROM python:3.12-slim
+FROM python:3.12
 
-# Install locales for UTF-8 support
-RUN apt-get update && apt-get install -y --no-install-recommends locales \
-    && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
-    && locale-gen en_US.UTF-8 \
-    && rm -rf /var/lib/apt/lists/*
-
-ENV LANG=en_US.UTF-8 \
-    LC_ALL=en_US.UTF-8 \
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
     PYTHONUTF8=1 \
     PYTHONIOENCODING=utf-8
 
@@ -29,4 +23,4 @@ EXPOSE 8000
 
 # Run from /app/backend/ so imports resolve correctly
 WORKDIR /app/backend
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python3", "-X", "utf8", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
