@@ -119,10 +119,12 @@ async def evaluate(request: Request, body: EvaluateRequest):
         result = await engine.evaluate(body)
         return result
     except Exception as e:
+        # Sanitize error message to ASCII to avoid encoding issues
+        msg = str(e).encode("ascii", errors="replace").decode("ascii")
         return JSONResponse(
             status_code=502,
             content={
-                "detail": f"LLM evaluation failed: {str(e)}",
+                "detail": f"LLM evaluation failed: {msg}",
                 "backend": engine.backend if engine else "unknown",
             },
         )
