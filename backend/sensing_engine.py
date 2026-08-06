@@ -107,7 +107,7 @@ class SensingEngine:
         try:
             client = await self._get_client()
             if self.backend in ("ollama_cloud", "openrouter"):
-                # OpenAI-compatible: list models
+                # OpenAI-compatible: just check the API responds
                 resp = await client.get(
                     f"{self.cloud_url}/models",
                     headers=self.cloud_headers,
