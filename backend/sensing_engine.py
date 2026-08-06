@@ -1,13 +1,15 @@
 """SensingEngine: LLM-powered evaluator with cross-topic credit detection.
 
-Sends a user's explanation to Ollama and asks it to:
-1. Score the target topic (L1-L4)
-2. Detect collateral knowledge about other pending topics
-3. Auto-strike topics that were sufficiently covered
+Supports three backends (auto-detected from environment):
+- Ollama Cloud: OLLAMA_API_KEY set → https://ollama.com/v1 (OpenAI-compatible)
+- OpenRouter: OPENROUTER_API_KEY set → https://openrouter.ai/api/v1 (OpenAI-compatible)
+- Local Ollama: neither key set → http://localhost:11434/api/chat
 """
 
 import json
 import logging
+import os
+import re
 from typing import Optional
 
 import httpx
@@ -55,7 +57,7 @@ If no remaining topics are covered, return an empty struck_topics array: []"""
 
 
 class SensingEngine:
-    """Evaluates user explanations via Ollama LLM."""
+    """Evaluates user explanations via LLM (Ollama Cloud, OpenRouter, or local Ollama)."""
 
     def __init__(
         self,
@@ -68,32 +70,68 @@ class SensingEngine:
         self.timeout = timeout
         self._client: Optional[httpx.AsyncClient] = None
 
+        # Detect backend from env
+        self.ollama_api_key = os.environ.get("OLLAMA_API_KEY", "")
+        self.openrouter_key = os.environ.get("OPENROUTER_API_KEY", "")
+
+        if self.ollama_api_key:
+            self.backend = "ollama_cloud"
+            self.cloud_url = "https://ollama.com/v1"
+            self.cloud_headers = {
+                "Authorization": f"Bearer {self.ollama_api_key}",
+                "Content-Type": "application/json",
+            }
+            logger.info(f"SensingEngine: using Ollama Cloud with model={self.model}")
+        elif self.openrouter_key:
+            self.backend = "openrouter"
+            self.cloud_url = os.environ.get(
+                "OPENROUTER_BASE_URL",
+                "https://openrouter.ai/api/v1",
+            ).rstrip("/")
+            self.cloud_headers = {
+                "Authorization": f"Bearer {self.openrouter_key}",
+                "Content-Type": "application/json",
+            }
+            logger.info(f"SensingEngine: using OpenRouter with model={self.model}")
+        else:
+            self.backend = "local_ollama"
+            logger.info(f"SensingEngine: using local Ollama at {self.ollama_url} with model={self.model}")
+
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None:
             self._client = httpx.AsyncClient(timeout=self.timeout)
         return self._client
 
     async def health_check(self) -> bool:
-        """Check if Ollama is reachable and the model is available."""
+        """Check if the LLM backend is reachable."""
         try:
             client = await self._get_client()
-            resp = await client.get(f"{self.ollama_url}/api/tags")
-            if resp.status_code != 200:
-                return False
-            data = resp.json()
-            models = [m["name"] for m in data.get("models", [])]
-            # Check if our model (or a prefix match) exists
-            return any(self.model in m or m.startswith(self.model.split(":")[0]) for m in models)
+            if self.backend in ("ollama_cloud", "openrouter"):
+                # OpenAI-compatible: list models
+                resp = await client.get(
+                    f"{self.cloud_url}/models",
+                    headers=self.cloud_headers,
+                )
+                return resp.status_code == 200
+            else:
+                # Local Ollama
+                resp = await client.get(f"{self.ollama_url}/api/tags")
+                if resp.status_code != 200:
+                    return False
+                data = resp.json()
+                models = [m["name"] for m in data.get("models", [])]
+                return any(
+                    self.model in m or m.startswith(self.model.split(":")[0])
+                    for m in models
+                )
         except Exception:
             return False
 
     async def evaluate(self, request: EvaluateRequest) -> EvaluateResponse:
         """Evaluate a user's explanation and detect cross-topic credit."""
         # Cap remaining topics to prevent the LLM from trying to evaluate all 140+
-        # Only send topics in the same domain + a sample from other domains
         same_domain = [t for t in request.remaining_topics if t.domain == request.target_domain]
         other_domains = [t for t in request.remaining_topics if t.domain != request.target_domain]
-        # Take all same-domain topics + up to 20 from other domains
         capped = same_domain + other_domains[:max(0, 30 - len(same_domain))]
         remaining_list = [
             {"name": t.name, "domain": t.domain}
@@ -110,32 +148,14 @@ REMAINING TOPICS (check if the explanation covers any of these):
 {json.dumps(remaining_list, indent=2)}"""
 
         client = await self._get_client()
-
         content = ""
+
         try:
-            resp = await client.post(
-                f"{self.ollama_url}/api/chat",
-                json={
-                    "model": self.model,
-                    "messages": [
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": user_message},
-                    ],
-                    "stream": False,
-                    "options": {
-                        "temperature": 0.1,  # Low temp for consistent scoring
-                        "num_predict": 2048,
-                    },
-                },
-            )
-            resp.raise_for_status()
-            data = resp.json()
+            if self.backend in ("ollama_cloud", "openrouter"):
+                content, tokens_used = await self._call_openai_compatible(user_message)
+            else:
+                content, tokens_used = await self._call_local_ollama(user_message)
 
-            # Extract the assistant's response
-            content = data["message"]["content"]
-            tokens_used = data.get("eval_count", data.get("total_duration", 0))
-
-            # Parse the JSON from the response
             result = self._parse_response(content)
 
             return EvaluateResponse(
@@ -154,31 +174,72 @@ REMAINING TOPICS (check if the explanation covers any of these):
             )
 
         except httpx.HTTPError as e:
-            logger.error(f"Ollama HTTP error: {e}")
+            logger.error(f"LLM HTTP error: {e}")
             raise
         except (KeyError, json.JSONDecodeError) as e:
-            logger.error(f"Failed to parse Ollama response: {e}\nContent: {content}")
+            logger.error(f"Failed to parse LLM response: {e}\nContent: {content}")
             raise
+
+    async def _call_openai_compatible(self, user_message: str) -> tuple[str, int]:
+        """Call an OpenAI-compatible chat completions endpoint (Ollama Cloud or OpenRouter)."""
+        client = await self._get_client()
+        resp = await client.post(
+            f"{self.cloud_url}/chat/completions",
+            headers=self.cloud_headers,
+            json={
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_message},
+                ],
+                "temperature": 0.1,
+                "max_tokens": 2048,
+            },
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        content = data["choices"][0]["message"]["content"]
+        tokens_used = data.get("usage", {}).get("total_tokens", 0)
+        return content, tokens_used
+
+    async def _call_local_ollama(self, user_message: str) -> tuple[str, int]:
+        """Call local Ollama's /api/chat endpoint."""
+        client = await self._get_client()
+        resp = await client.post(
+            f"{self.ollama_url}/api/chat",
+            json={
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_message},
+                ],
+                "stream": False,
+                "options": {
+                    "temperature": 0.1,
+                    "num_predict": 2048,
+                },
+            },
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        content = data["message"]["content"]
+        tokens_used = data.get("eval_count", data.get("total_duration", 0))
+        return content, tokens_used
 
     def _parse_response(self, content: str) -> dict:
         """Extract JSON from the LLM response, handling various formats."""
-        import re
-
         content = content.strip()
-        original = content  # keep for error logging
+        original = content
 
-        # Strategy 1: extract from ```json ... ``` block
         if "```json" in content:
             start = content.index("```json") + 7
             end = content.index("```", start)
             content = content[start:end].strip()
-        # Strategy 2: extract from ``` ... ``` block
         elif "```" in content:
             start = content.index("```") + 3
             end = content.index("```", start)
             content = content[start:end].strip()
 
-        # Strategy 3: find the outermost { ... } pair
         if not content.startswith("{"):
             match = re.search(r'\{.*\}', content, re.DOTALL)
             if match:
@@ -187,10 +248,7 @@ REMAINING TOPICS (check if the explanation covers any of these):
         try:
             return json.loads(content)
         except json.JSONDecodeError:
-            # Strategy 4: try to fix common LLM JSON issues
-            # Remove trailing commas before closing braces/brackets
             fixed = re.sub(r',\s*([}\]])', r'\1', content)
-            # Remove any text after the final closing brace
             last_brace = fixed.rfind('}')
             if last_brace != -1:
                 fixed = fixed[:last_brace + 1]
@@ -206,14 +264,12 @@ REMAINING TOPICS (check if the explanation covers any of these):
 
     @staticmethod
     def _find_domain(topic_name: str, remaining: list[TopicInfo]) -> str:
-        """Find the domain for a topic name from the remaining list."""
         for t in remaining:
             if t.name.lower() == topic_name.lower():
                 return t.domain
         return "unknown"
 
     async def close(self):
-        """Close the HTTP client."""
         if self._client:
             await self._client.aclose()
             self._client = None

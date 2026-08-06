@@ -607,9 +607,10 @@
 <script src="assets/js/data.js"></script>
 <script>
 // ─── Constants ───
-// Configurable via ?api= URL param, defaults to localhost for development
-const urlParams = new URLSearchParams(window.location.search);
-const API_BASE = urlParams.get('api') || 'http://localhost:8000';
+// Auto-detect: use relative path when served from same origin, localhost for dev
+const API_BASE = (window.location.hostname === 'localhost' && window.location.port !== '8000')
+  ? 'http://localhost:8000'
+  : '';
 const LV = {
   1:{name:"Untouched",       desc:"Hasn't come up at all",              css:"--L1"},
   2:{name:"Heard of it",     desc:"Briefly encountered or asked about", css:"--L2"},
