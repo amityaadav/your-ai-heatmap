@@ -123,7 +123,7 @@ async def evaluate(request: Request, body: EvaluateRequest):
             status_code=502,
             content={
                 "detail": f"LLM evaluation failed: {str(e)}",
-                "backend": "openrouter" if engine.use_openrouter else "ollama",
+                "backend": engine.backend if engine else "unknown",
             },
         )
 
