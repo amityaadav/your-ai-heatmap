@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Knowledge Quiz — Amit Yadav</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDF0F4;
+    --paper-2:#F7F9FB;
+    --ink:#0F131B;
+    --ink-2:#3D4756;
+    --ink-3:#6B7789;
+    --rule:#C8CFD9;
+
+    --L1:#C2382B;
+    --L2:#F0A99E;
+    --L3:#8ECB92;
+    --L4:#1C6B3C;
+
+    --L1-ink:#FFFFFF;
+    --L2-ink:#5C1B12;
+    --L3-ink:#12351A;
+    --L4-ink:#EAF6EE;
+
+    --display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+    --body:'IBM Plex Sans',ui-sans-serif,system-ui,sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:15px;
+    line-height:1.55;
+    padding:clamp(20px,4vw,56px) clamp(16px,4vw,56px) 80px;
+  }
+
+  .shell{max-width:900px;margin:0 auto}
+
+  /* ---------- header ---------- */
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 18px;
+    border-bottom:1px solid var(--rule);
+    padding-bottom:10px;
+    margin-bottom:22px;
+  }
+  h1{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:clamp(26px,4vw,42px);
+    line-height:1.05;
+    letter-spacing:-0.028em;
+    margin:0 0 10px;
+  }
+  h1 em{font-style:normal;color:var(--L1)}
+
+  /* ---------- progress ---------- */
+  .progress-wrap{margin:0 0 28px}
+  .progress-label{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.15em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    margin-bottom:6px;
+    display:flex;justify-content:space-between;
+  }
+  .progress-bar{
+    height:6px;
+    background:var(--rule);
+    border:1px solid var(--ink);
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--L4);
+    transition:width .3s ease;
+  }
+
+  /* ---------- quiz card ---------- */
+  .quiz-card{
+    background:var(--paper-2);
+    border:1px solid var(--ink);
+    padding:clamp(20px,3vw,36px);
+    margin-bottom:24px;
+  }
+  .domain-tag{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    margin-bottom:8px;
+  }
+  .topic-name{
+    font-family:var(--display);
+    font-size:clamp(20px,2.8vw,28px);
+    font-weight:700;
+    letter-spacing:-.02em;
+    margin:0 0 6px;
+    line-height:1.15;
+  }
+  .topic-counter{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-3);
+    margin-bottom:20px;
+  }
+  .explanation-label{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--ink-2);
+    margin-bottom:8px;
+  }
+  textarea{
+    width:100%;
+    min-height:140px;
+    padding:14px;
+    font-family:var(--mono);
+    font-size:13px;
+    line-height:1.55;
+    border:1px solid var(--ink);
+    background:var(--paper);
+    color:var(--ink);
+    resize:vertical;
+  }
+  textarea:focus{outline:2px solid var(--ink);outline-offset:2px}
+  textarea::placeholder{color:var(--ink-3)}
+
+  .btn-row{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  button{
+    all:unset;
+    cursor:pointer;
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    padding:12px 24px;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    transition:background .14s, color .14s;
+  }
+  button:hover{background:var(--ink-2)}
+  button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  button:disabled{opacity:.35;cursor:not-allowed}
+  button.secondary{
+    background:transparent;
+    color:var(--ink);
+  }
+  button.secondary:hover{background:var(--paper)}
+
+  /* ---------- status ---------- */
+  .status{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-3);
+    margin-top:12px;
+    min-height:20px;
+  }
+  .status.error{color:var(--L1)}
+  .status.success{color:var(--L4)}
+
+  /* ---------- struck topics ---------- */
+  .struck-list{
+    margin-top:16px;
+    border-top:1px solid var(--rule);
+    padding-top:14px;
+  }
+  .struck-list h4{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+    color:var(--L4);
+    margin:0 0 8px;
+  }
+  .struck-item{
+    font-size:12.5px;
+    padding:6px 0;
+    border-bottom:1px solid var(--rule);
+    display:flex;
+    gap:10px;
+    align-items:baseline;
+  }
+  .struck-item .s-name{font-weight:600;flex:0 0 auto}
+  .struck-item .s-score{
+    font-family:var(--mono);
+    font-size:10px;
+    padding:1px 6px;
+    border:1px solid var(--ink);
+    flex:0 0 auto;
+  }
+  .struck-item .s-reason{color:var(--ink-3);font-size:12px}
+
+  /* ---------- domain summary ---------- */
+  .domain-summary{
+    background:var(--paper-2);
+    border:1px solid var(--ink);
+    padding:clamp(20px,3vw,32px);
+    margin-bottom:24px;
+  }
+  .domain-summary h2{
+    font-family:var(--display);
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:-.02em;
+    margin:0 0 16px;
+  }
+  .summary-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--ink);
+    border:1px solid var(--ink);
+    margin-bottom:16px;
+  }
+  .summary-cell{
+    background:var(--paper-2);
+    padding:14px 12px;
+    text-align:center;
+  }
+  .summary-cell .sc-num{
+    font-family:var(--display);
+    font-size:28px;
+    font-weight:700;
+    line-height:1;
+  }
+  .summary-cell .sc-label{
+    font-family:var(--mono);
+    font-size:9.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    margin-top:4px;
+  }
+
+  /* ---------- final heatmap reveal ---------- */
+  .reveal-section{margin-top:40px}
+  .reveal-section h2{
+    font-family:var(--display);
+    font-size:clamp(24px,3.5vw,36px);
+    font-weight:700;
+    letter-spacing:-.025em;
+    margin:0 0 8px;
+  }
+  .reveal-section .subtitle{
+    color:var(--ink-2);
+    margin:0 0 24px;
+    font-size:15px;
+  }
+
+  /* ---------- heatmap (reused from index.html) ---------- */
+  .ribbon-block{margin:0 0 12px}
+  .ribbon-label{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.15em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    margin-bottom:8px;
+  }
+  .ribbon{
+    display:flex;
+    height:64px;
+    width:100%;
+    border:1px solid var(--ink);
+    overflow:hidden;
+  }
+  .ribbon-seg{
+    display:flex;
+    align-items:flex-end;
+    padding:8px 10px;
+    position:relative;
+    transition:flex-grow .5s cubic-bezier(.4,0,.2,1);
+    min-width:0;
+  }
+  .ribbon-seg + .ribbon-seg{border-left:1px solid var(--ink)}
+  .ribbon-seg b{
+    font-family:var(--display);
+    font-size:clamp(18px,2.6vw,30px);
+    font-weight:700;
+    line-height:1;
+    letter-spacing:-.03em;
+  }
+  .ribbon-seg span{
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    margin-left:7px;
+    padding-bottom:2px;
+    opacity:.85;
+    white-space:nowrap;
+    overflow:hidden;
+  }
+
+  .legend{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--ink);
+    border:1px solid var(--ink);
+    margin-bottom:38px;
+  }
+  .legend button{
+    all:unset;
+    cursor:pointer;
+    background:var(--paper-2);
+    padding:11px 13px 13px;
+    display:block;
+    min-width:0;
+    transition:background .16s;
+  }
+  .legend button:hover{background:#fff}
+  .legend .sw{
+    display:flex;align-items:center;gap:8px;
+    font-family:var(--mono);
+    font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--ink-3);
+    margin-bottom:5px;
+  }
+  .legend .chip{width:14px;height:14px;border:1px solid var(--ink);flex:0 0 auto}
+  .legend .desc{
+    font-size:12.5px;line-height:1.35;color:var(--ink-2);
+    display:block;
+  }
+  .legend button[aria-pressed="true"]{background:var(--ink)}
+  .legend button[aria-pressed="true"] .sw,
+  .legend button[aria-pressed="true"] .desc{color:var(--paper)}
+  .legend button[aria-pressed="true"] .chip{border-color:var(--paper)}
+
+  .grid-wrap{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 320px;
+    gap:clamp(20px,3vw,44px);
+    align-items:start;
+  }
+  .domain{
+    border-top:1px solid var(--ink);
+    padding:16px 0 24px;
+  }
+  .domain-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .domain-head h2{
+    font-family:var(--display);
+    font-size:17px;
+    font-weight:700;
+    letter-spacing:-.012em;
+    margin:0;
+  }
+  .domain-note{
+    font-size:12.5px;
+    color:var(--ink-3);
+    margin:0;
+    flex:1 1 240px;
+    min-width:0;
+  }
+  .microbar{
+    display:flex;
+    height:9px;
+    width:132px;
+    flex:0 0 auto;
+    border:1px solid var(--ink);
+  }
+  .microbar i{display:block}
+
+  .cells{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(154px,1fr));
+    gap:4px;
+  }
+  .cell{
+    all:unset;
+    cursor:pointer;
+    display:block;
+    padding:9px 10px 10px;
+    min-height:56px;
+    font-family:var(--mono);
+    font-size:11.5px;
+    line-height:1.28;
+    letter-spacing:-.005em;
+    border:1px solid rgba(15,19,27,.28);
+    transition:transform .13s ease, box-shadow .13s ease, opacity .2s ease;
+    position:relative;
+  }
+  .cell:hover{transform:translateY(-2px);box-shadow:0 4px 0 0 var(--ink);z-index:2}
+  .cell[data-lvl="1"]{background:var(--L1);color:var(--L1-ink)}
+  .cell[data-lvl="2"]{background:var(--L2);color:var(--L2-ink)}
+  .cell[data-lvl="3"]{background:var(--L3);color:var(--L3-ink)}
+  .cell[data-lvl="4"]{background:var(--L4);color:var(--L4-ink)}
+  .cell .lvl{
+    position:absolute;top:6px;right:7px;
+    font-size:9px;opacity:.55;font-weight:600;
+  }
+  .cell.dim{opacity:.14;pointer-events:none}
+  .cell.sel{box-shadow:0 0 0 3px var(--ink)}
+
+  .rail{
+    position:sticky;
+    top:24px;
+    border:1px solid var(--ink);
+    background:var(--paper-2);
+    padding:18px 18px 20px;
+  }
+  .rail .k{
+    font-family:var(--mono);
+    font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink-3);
+    margin-bottom:10px;
+  }
+  .rail h3{
+    font-family:var(--display);
+    font-size:20px;font-weight:700;letter-spacing:-.02em;
+    margin:0 0 4px;line-height:1.14;
+  }
+  .rail .band{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    border:1px solid var(--ink);padding:3px 8px;margin:8px 0 14px;
+  }
+  .rail .band i{width:10px;height:10px;display:block}
+  .rail .why{font-size:13.5px;line-height:1.5;color:var(--ink-2);margin:0 0 14px}
+  .rail .ev{
+    font-family:var(--mono);font-size:11px;line-height:1.5;
+    color:var(--ink-3);border-top:1px solid var(--rule);padding-top:11px;margin:0;
+  }
+
+  .method{
+    border-top:1px solid var(--ink);
+    margin-top:40px;padding-top:22px;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:26px;
+  }
+  .method h4{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--ink-3);margin:0 0 8px;font-weight:500;
+  }
+  .method p{margin:0;font-size:13px;line-height:1.55;color:var(--ink-2)}
+
+  .hidden{display:none!important}
+
+  @media (max-width:1080px){
+    .grid-wrap{grid-template-columns:minmax(0,1fr)}
+    .rail{
+      position:fixed;left:0;right:0;bottom:0;top:auto;
+      border-left:0;border-right:0;border-bottom:0;
+      z-index:40;
+      transform:translateY(101%);
+      transition:transform .22s cubic-bezier(.4,0,.2,1);
+      max-height:64vh;overflow:auto;
+      box-shadow:0 -10px 30px rgba(15,19,27,.16);
+    }
+    .rail.open{transform:translateY(0)}
+    .rail-close{
+      all:unset;cursor:pointer;position:absolute;top:12px;right:14px;
+      font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+      text-transform:uppercase;color:var(--ink-3);
+    }
+  }
+  @media (min-width:1081px){ .rail-close{display:none} }
+  @media (max-width:560px){
+    .legend{grid-template-columns:repeat(2,1fr)}
+    .cells{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
+    .summary-grid{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ===== QUIZ MODE ===== -->
+  <div id="quiz-mode">
+    <div class="eyebrow">
+      <span>Knowledge quiz</span>
+      <span id="n-topics">143 topics</span>
+      <span>LLM-evaluated</span>
+    </div>
+
+    <h1>What do you <em>actually</em> know?</h1>
+
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="progress-domain">Getting started</span>
+        <span id="progress-count">0 / 143</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="quiz-card" id="quiz-card">
+      <div class="domain-tag" id="domain-tag"></div>
+      <div class="topic-name" id="topic-name"></div>
+      <div class="topic-counter" id="topic-counter"></div>
+
+      <div class="explanation-label">Explain what you know about this topic</div>
+      <textarea
+        id="explanation"
+        placeholder="Be specific — name tools, projects, concepts, problems you've solved. The more detail you provide, the more accurate the evaluation. Other topics you mention may get auto-scored."
+      ></textarea>
+
+      <div class="btn-row">
+        <button id="btn-submit" onclick="submitAnswer()">Submit (⌘↵)</button>
+        <button class="secondary" id="btn-skip" onclick="skipTopic()">Skip for now</button>
+      </div>
+
+      <div class="status" id="status"></div>
+      <div class="struck-list hidden" id="struck-list">
+        <h4>Topics auto-scored from your answer</h4>
+        <div id="struck-items"></div>
+      </div>
+    </div>
+
+    <!-- Domain summary (shown between domains) -->
+    <div class="domain-summary hidden" id="domain-summary">
+      <h2 id="summary-domain-name"></h2>
+      <div class="summary-grid" id="summary-grid"></div>
+      <div class="btn-row">
+        <button id="btn-next-domain" onclick="startNextDomain()">Continue to next domain</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FINAL REVEAL MODE ===== -->
+  <div id="reveal-mode" class="hidden">
+    <div class="eyebrow">
+      <span>Knowledge survey</span>
+      <span id="reveal-name">Your results</span>
+      <span id="reveal-date"></span>
+      <span id="reveal-count"></span>
+      <span>LLM-evaluated from your explanations</span>
+    </div>
+
+    <div class="reveal-section">
+      <h2>Your AI Knowledge Heatmap</h2>
+      <p class="subtitle">Generated from your quiz responses — each score backed by your own explanations, evaluated by an LLM against the L1–L4 rubric.</p>
+    </div>
+
+    <div class="ribbon-block">
+      <div class="ribbon-label">Overall distribution — width is proportional to topic count</div>
+      <div class="ribbon" id="ribbon" role="img"></div>
+    </div>
+
+    <div class="legend" id="legend"></div>
+
+    <div class="grid-wrap">
+      <main id="matrix"></main>
+      <aside class="rail" id="rail" aria-live="polite">
+        <button class="rail-close" id="railClose" onclick="closeRail()">Close ✕</button>
+        <div class="k">Selected topic</div>
+        <h3 id="r-title">Pick a cell</h3>
+        <div class="band" id="r-band" hidden><i></i><span></span></div>
+        <p class="why" id="r-why"></p>
+        <p class="ev" id="r-ev"></p>
+      </aside>
+    </div>
+
+    <div class="method">
+      <div>
+        <h4>How this was scored</h4>
+        <p>You wrote free-text explanations for each topic. An LLM evaluated them against the L1–L4 rubric, looking for concrete evidence: named tools, projects referenced, problems debugged, concepts explained correctly. Topics you demonstrated knowledge of in other answers were auto-scored via cross-topic credit.</p>
+      </div>
+      <div>
+        <h4>The known bias</h4>
+        <p>This maps what you wrote in this session. Knowledge you didn't articulate — or topics you skipped — will be scored too low. You can re-run the quiz anytime to update your map.</p>
+      </div>
+      <div>
+        <h4>Reading breadth vs depth</h4>
+        <p>Breadth is how much of the board is not red. Depth is how much is dark green. A wide band of light green with few dark cells is the signature of someone who reads and explains faster than they build — the fix is fewer new topics, more finished ones.</p>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top:32px">
+      <button onclick="downloadHeatmap()">Download index_final.html</button>
+      <button class="secondary" onclick="resetQuiz()">Take the quiz again</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="assets/js/data.js"></script>
+<script>
+// ─── Constants ───
+// Configurable via ?api= URL param, defaults to localhost for development
+const urlParams = new URLSearchParams(window.location.search);
+const API_BASE = urlParams.get('api') || 'http://localhost:8000';
+const LV = {
+  1:{name:"Untouched",       desc:"Hasn't come up at all",              css:"--L1"},
+  2:{name:"Heard of it",     desc:"Briefly encountered or asked about", css:"--L2"},
+  3:{name:"Can explain",     desc:"Solid enough to teach a peer",       css:"--L3"},
+  4:{name:"Can teach / built",desc:"Built with it or taught it",        css:"--L4"}
+};
+
+// ─── State ───
+const SESSION_ID = 'quiz-' + Date.now();
+let allTopics = [];        // flat list of {name, domain, level, why, ev}
+let pendingTopics = [];    // topics not yet evaluated
+let evaluatedTopics = [];  // {name, domain, score, reasoning, evidence}
+let currentTopic = null;
+let currentDomainIndex = 0;
+let domainOrder = [];      // ordered list of domain names
+let isSubmitting = false;
+
+// ─── Init ───
+function initQuiz() {
+  // Flatten DOMAINS into a topic list
+  allTopics = [];
+  const seen = new Set();
+  DOMAINS.forEach(dom => {
+    if (!domainOrder.includes(dom.d)) domainOrder.push(dom.d);
+    dom.t.forEach(([name, lvl, why, ev]) => {
+      if (!seen.has(name)) {
+        seen.add(name);
+        allTopics.push({name, domain: dom.d, level: lvl, why, ev});
+      }
+    });
+  });
+
+  // Try to restore from LocalStorage
+  const saved = localStorage.getItem('ai-heatmap-quiz');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      evaluatedTopics = data.evaluated || [];
+      pendingTopics = data.pending || [];
+      currentDomainIndex = data.domainIndex || 0;
+      // Filter pending to only topics still in allTopics
+      const evalNames = new Set(evaluatedTopics.map(t => t.name));
+      pendingTopics = allTopics.filter(t => !evalNames.has(t.name));
+    } catch(e) {
+      resetState();
+    }
+  } else {
+    resetState();
+  }
+
+  document.getElementById('n-topics').textContent = `${allTopics.length} topics`;
+  updateProgress();
+  showNextTopic();
+}
+
+function resetState() {
+  evaluatedTopics = [];
+  pendingTopics = [...allTopics];
+  currentDomainIndex = 0;
+  saveState();
+}
+
+function saveState() {
+  localStorage.setItem('ai-heatmap-quiz', JSON.stringify({
+    evaluated: evaluatedTopics,
+    pending: pendingTopics,
+    domainIndex: currentDomainIndex,
+  }));
+}
+
+// ─── Progress ───
+function updateProgress() {
+  const total = allTopics.length;
+  const done = evaluatedTopics.length;
+  const pct = Math.round((done / total) * 100);
+
+  document.getElementById('progress-count').textContent = `${done} / ${total}`;
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  // Current domain
+  if (pendingTopics.length > 0) {
+    document.getElementById('progress-domain').textContent = pendingTopics[0].domain;
+  } else {
+    document.getElementById('progress-domain').textContent = 'Complete';
+  }
+}
+
+// ─── Topic navigation ───
+function showNextTopic() {
+  if (pendingTopics.length === 0) {
+    showFinalReveal();
+    return;
+  }
+
+  // Check if we've crossed a domain boundary
+  const nextDomain = pendingTopics[0].domain;
+  const nextDomainIdx = domainOrder.indexOf(nextDomain);
+  if (nextDomainIdx > currentDomainIndex && evaluatedTopics.length > 0) {
+    // Show domain summary
+    showDomainSummary(domainOrder[currentDomainIndex]);
+    return;
+  }
+
+  currentTopic = pendingTopics[0];
+  document.getElementById('domain-tag').textContent = currentTopic.domain;
+  document.getElementById('topic-name').textContent = currentTopic.name;
+  document.getElementById('topic-counter').textContent =
+    `${evaluatedTopics.length + 1} of ${allTopics.length} · ${pendingTopics.length} remaining`;
+  document.getElementById('explanation').value = '';
+  document.getElementById('status').textContent = '';
+  document.getElementById('status').className = 'status';
+  document.getElementById('struck-list').classList.add('hidden');
+  document.getElementById('struck-items').innerHTML = '';
+  document.getElementById('btn-submit').disabled = false;
+  document.getElementById('btn-skip').disabled = false;
+  document.getElementById('explanation').focus();
+
+  // Hide domain summary if visible
+  document.getElementById('domain-summary').classList.add('hidden');
+  document.getElementById('quiz-card').classList.remove('hidden');
+}
+
+function showDomainSummary(domainName) {
+  document.getElementById('quiz-card').classList.add('hidden');
+  document.getElementById('domain-summary').classList.remove('hidden');
+  document.getElementById('summary-domain-name').textContent = domainName + ' — Complete';
+
+  const domainTopics = evaluatedTopics.filter(t => t.domain === domainName);
+  const counts = {1:0, 2:0, 3:0, 4:0};
+  domainTopics.forEach(t => { if (counts[t.score] !== undefined) counts[t.score]++; });
+
+  const grid = document.getElementById('summary-grid');
+  grid.innerHTML = '';
+  [4,3,2,1].forEach(l => {
+    const div = document.createElement('div');
+    div.className = 'summary-cell';
+    div.innerHTML = `<div class="sc-num" style="color:var(--L${l})">${counts[l]}</div>
+                     <div class="sc-label">${LV[l].name}</div>`;
+    grid.appendChild(div);
+  });
+
+  currentDomainIndex = domainOrder.indexOf(domainName) + 1;
+  saveState();
+}
+
+function startNextDomain() {
+  document.getElementById('domain-summary').classList.add('hidden');
+  document.getElementById('quiz-card').classList.remove('hidden');
+  showNextTopic();
+}
+
+// ─── Submit answer ───
+async function submitAnswer() {
+  if (isSubmitting || !currentTopic) return;
+
+  const explanation = document.getElementById('explanation').value.trim();
+  if (explanation.length < 10) {
+    document.getElementById('status').textContent = 'Please write at least 10 characters.';
+    document.getElementById('status').className = 'status error';
+    return;
+  }
+
+  isSubmitting = true;
+  document.getElementById('btn-submit').disabled = true;
+  document.getElementById('btn-skip').disabled = true;
+  document.getElementById('status').textContent = 'Evaluating...';
+  document.getElementById('status').className = 'status';
+
+  try {
+    const remaining = pendingTopics.slice(1).map(t => ({
+      name: t.name,
+      domain: t.domain,
+      level: t.level
+    }));
+
+    const resp = await fetch(`${API_BASE}/evaluate`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        target_topic: currentTopic.name,
+        target_domain: currentTopic.domain,
+        explanation: explanation,
+        remaining_topics: remaining,
+        session_id: SESSION_ID,
+      }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({detail: resp.statusText}));
+      throw new Error(err.detail || `HTTP ${resp.status}`);
+    }
+
+    const result = await resp.json();
+
+    // Record the target topic
+    evaluatedTopics.push({
+      name: currentTopic.name,
+      domain: currentTopic.domain,
+      score: result.target_score,
+      reasoning: result.target_reasoning,
+      evidence: explanation,
+    });
+
+    // Remove from pending
+    pendingTopics.shift();
+
+    // Handle struck topics
+    if (result.struck_topics && result.struck_topics.length > 0) {
+      const struckNames = new Set();
+      result.struck_topics.forEach(st => {
+        struckNames.add(st.name);
+        evaluatedTopics.push({
+          name: st.name,
+          domain: st.domain,
+          score: st.score,
+          reasoning: st.reason,
+          evidence: '(auto-scored via cross-topic credit)',
+        });
+      });
+
+      // Remove struck topics from pending
+      pendingTopics = pendingTopics.filter(t => !struckNames.has(t.name));
+
+      // Show struck topics
+      const itemsDiv = document.getElementById('struck-items');
+      itemsDiv.innerHTML = result.struck_topics.map(st =>
+        `<div class="struck-item">
+          <span class="s-name">${st.name}</span>
+          <span class="s-score" style="background:var(--L${st.score});color:var(--L${st.score}-ink)">L${st.score}</span>
+          <span class="s-reason">${st.reason}</span>
+        </div>`
+      ).join('');
+      document.getElementById('struck-list').classList.remove('hidden');
+    }
+
+    document.getElementById('status').textContent =
+      `Scored L${result.target_score} · ${LV[result.target_score].name}` +
+      (result.struck_topics?.length ? ` · +${result.struck_topics.length} topics auto-scored` : '');
+    document.getElementById('status').className = 'status success';
+
+    saveState();
+    updateProgress();
+
+    // Auto-advance after a short delay so user can see the result
+    setTimeout(() => showNextTopic(), 1200);
+
+  } catch (e) {
+    document.getElementById('status').textContent = `Error: ${e.message}. Is the backend running? (cd backend && uvicorn main:app --reload)`;
+    document.getElementById('status').className = 'status error';
+    document.getElementById('btn-submit').disabled = false;
+    document.getElementById('btn-skip').disabled = false;
+  } finally {
+    isSubmitting = false;
+  }
+}
+
+function skipTopic() {
+  if (!currentTopic) return;
+
+  // Move to end of pending (will come back to it)
+  const skipped = pendingTopics.shift();
+  pendingTopics.push(skipped);
+
+  // If all remaining are skipped, treat as L1
+  if (pendingTopics.every(t => evaluatedTopics.some(e => e.name === t.name))) {
+    // All topics have been seen — score remaining as L1
+    pendingTopics.forEach(t => {
+      evaluatedTopics.push({
+        name: t.name,
+        domain: t.domain,
+        score: 1,
+        reasoning: 'Skipped — no explanation provided.',
+        evidence: '',
+      });
+    });
+    pendingTopics = [];
+    saveState();
+    updateProgress();
+    showFinalReveal();
+    return;
+  }
+
+  saveState();
+  showNextTopic();
+}
+
+// ─── Final reveal ───
+function showFinalReveal() {
+  // Score any remaining pending topics as L1
+  pendingTopics.forEach(t => {
+    evaluatedTopics.push({
+      name: t.name,
+      domain: t.domain,
+      score: 1,
+      reasoning: 'Not evaluated — quiz completed before this topic was reached.',
+      evidence: '',
+    });
+  });
+  pendingTopics = [];
+  saveState();
+
+  document.getElementById('quiz-mode').classList.add('hidden');
+  document.getElementById('reveal-mode').classList.remove('hidden');
+
+  document.getElementById('reveal-date').textContent =
+    'Compiled ' + new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}).replace(/ /g,' ');
+  document.getElementById('reveal-count').textContent = `${allTopics.length} topics`;
+
+  buildHeatmap();
+}
+
+function buildHeatmap() {
+  // Build a lookup: topic name → score + reasoning + evidence
+  const lookup = {};
+  evaluatedTopics.forEach(t => { lookup[t.name] = t; });
+
+  const matrix = document.getElementById('matrix');
+  matrix.innerHTML = '';
+  const counts = {1:0, 2:0, 3:0, 4:0};
+  let total = 0;
+
+  DOMAINS.forEach(dom => {
+    const local = {1:0, 2:0, 3:0, 4:0};
+    dom.t.forEach(t => {
+      const score = lookup[t[0]]?.score || 1;
+      local[score]++;
+      counts[score]++;
+      total++;
+    });
+
+    const sec = document.createElement('section');
+    sec.className = 'domain';
+
+    const head = document.createElement('div');
+    head.className = 'domain-head';
+    head.innerHTML = `<h2>${dom.d}</h2><p class="domain-note">${dom.note}</p>`;
+
+    const mb = document.createElement('div');
+    mb.className = 'microbar';
+    mb.setAttribute('role','img');
+    [4,3,2,1].forEach(l => {
+      if (!local[l]) return;
+      const i = document.createElement('i');
+      i.style.flex = local[l];
+      i.style.background = `var(${LV[l].css})`;
+      mb.appendChild(i);
+    });
+    head.appendChild(mb);
+    sec.appendChild(head);
+
+    const cells = document.createElement('div');
+    cells.className = 'cells';
+    dom.t.forEach(([name, origLvl, origWhy, origEv]) => {
+      const entry = lookup[name];
+      const lvl = entry?.score || 1;
+      const why = entry?.reasoning || 'Not evaluated in this session.';
+      const ev = entry?.evidence || '';
+
+      const b = document.createElement('button');
+      b.className = 'cell';
+      b.dataset.lvl = lvl;
+      b.innerHTML = `<span class="lvl">${lvl}</span>${name}`;
+      b.addEventListener('click', () => selectCell(b, name, lvl, why, ev, dom.d));
+      cells.appendChild(b);
+    });
+    sec.appendChild(cells);
+    matrix.appendChild(sec);
+  });
+
+  // Ribbon
+  const ribbon = document.getElementById('ribbon');
+  ribbon.innerHTML = '';
+  [4,3,2,1].forEach(l => {
+    const seg = document.createElement('div');
+    seg.className = 'ribbon-seg';
+    seg.style.flexGrow = counts[l] || 1;
+    seg.style.background = `var(${LV[l].css})`;
+    seg.style.color = `var(${LV[l].css}-ink)`;
+    const pct = Math.round((counts[l] / total) * 100);
+    seg.innerHTML = `<b>${counts[l]}</b><span>${LV[l].name} · ${pct}%</span>`;
+    ribbon.appendChild(seg);
+  });
+
+  // Legend
+  const legend = document.getElementById('legend');
+  legend.innerHTML = '';
+  let activeFilter = null;
+  [1,2,3,4].forEach(l => {
+    const b = document.createElement('button');
+    b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = `<span class="sw"><i class="chip" style="background:var(${LV[l].css})"></i>${l} · ${LV[l].name}</span><span class="desc">${LV[l].desc} — ${counts[l]} topics</span>`;
+    b.addEventListener('click', () => {
+      activeFilter = (activeFilter === l) ? null : l;
+      [...legend.children].forEach((x, i) => x.setAttribute('aria-pressed', String(activeFilter === i + 1)));
+      document.querySelectorAll('#matrix .cell').forEach(c => {
+        c.classList.toggle('dim', activeFilter !== null && +c.dataset.lvl !== activeFilter);
+      });
+    });
+    legend.appendChild(b);
+  });
+}
+
+function selectCell(btn, name, lvl, why, ev, dom) {
+  document.querySelectorAll('#matrix .cell.sel').forEach(c => c.classList.remove('sel'));
+  btn.classList.add('sel');
+  document.getElementById('r-title').textContent = name;
+  const band = document.getElementById('r-band');
+  band.hidden = false;
+  band.querySelector('i').style.background = `var(${LV[lvl].css})`;
+  band.querySelector('span').textContent = `${lvl} · ${LV[lvl].name}`;
+  document.getElementById('r-why').textContent = why;
+  document.getElementById('r-ev').innerHTML = ev
+    ? `<b>Your explanation</b> — ${ev}<br><b>Domain</b> — ${dom}`
+    : `<b>Evidence</b> — none provided.<br><b>Domain</b> — ${dom}`;
+}
+
+function closeRail() {
+  document.getElementById('rail').classList.remove('open');
+}
+
+// ─── Download ───
+function downloadHeatmap() {
+  // Clone the reveal section into a standalone HTML file
+  const clone = document.getElementById('reveal-mode').cloneNode(true);
+  // Remove buttons
+  clone.querySelector('.btn-row')?.remove();
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Knowledge Survey — Your Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>${document.querySelector('style').textContent}</style>
+</head>
+<body>
+<div class="shell">
+${clone.innerHTML}
+</div>
+<script>
+  // Re-bind legend filter
+  (function(){
+    const legend = document.getElementById('legend');
+    if(!legend) return;
+    let activeFilter = null;
+    [...legend.children].forEach((b,i) => {
+      b.addEventListener('click', () => {
+        activeFilter = (activeFilter === i+1) ? null : i+1;
+        [...legend.children].forEach((x,j) => x.setAttribute('aria-pressed', String(activeFilter === j+1)));
+        document.querySelectorAll('.cell').forEach(c => {
+          c.classList.toggle('dim', activeFilter !== null && +c.dataset.lvl !== activeFilter);
+        });
+      });
+    });
+  })();
+<\/script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], {type: 'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'index_final.html';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetQuiz() {
+  localStorage.removeItem('ai-heatmap-quiz');
+  location.reload();
+}
+
+// ─── Keyboard shortcut ───
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+    e.preventDefault();
+    submitAnswer();
+  }
+});
+
+// ─── Start ───
+initQuiz();
+</script>
+</body>
+</html>
