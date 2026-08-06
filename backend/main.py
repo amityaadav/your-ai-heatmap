@@ -53,7 +53,7 @@ async def lifespan(app: FastAPI):
     openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
 
     if ollama_api_key:
-        model = os.getenv("OLLAMA_CLOUD_MODEL", "deepseek-v4-pro:cloud")
+        model = os.getenv("OLLAMA_CLOUD_MODEL", "deepseek-v4-pro")
         ollama_url = "http://localhost:11434"  # not used
     elif openrouter_key:
         model = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini")

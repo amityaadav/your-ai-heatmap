@@ -183,24 +183,33 @@ REMAINING TOPICS (check if the explanation covers any of these):
     async def _call_openai_compatible(self, user_message: str) -> tuple[str, int]:
         """Call an OpenAI-compatible chat completions endpoint (Ollama Cloud or OpenRouter)."""
         client = await self._get_client()
-        resp = await client.post(
-            f"{self.cloud_url}/chat/completions",
-            headers=self.cloud_headers,
-            json={
-                "model": self.model,
-                "messages": [
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_message},
-                ],
-                "temperature": 0.1,
-                "max_tokens": 2048,
-            },
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        content = data["choices"][0]["message"]["content"]
-        tokens_used = data.get("usage", {}).get("total_tokens", 0)
-        return content, tokens_used
+        try:
+            resp = await client.post(
+                f"{self.cloud_url}/chat/completions",
+                headers=self.cloud_headers,
+                json={
+                    "model": self.model,
+                    "messages": [
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": user_message},
+                    ],
+                    "temperature": 0.1,
+                    "max_tokens": 2048,
+                },
+            )
+            resp.raise_for_status()
+            data = resp.json()
+            content = data["choices"][0]["message"]["content"]
+            tokens_used = data.get("usage", {}).get("total_tokens", 0)
+            return content, tokens_used
+        except httpx.HTTPStatusError as e:
+            # Extract the actual error from the response body
+            try:
+                body = e.response.json()
+                detail = body.get("error", {}).get("message", str(e))
+            except Exception:
+                detail = str(e)
+            raise RuntimeError(f"API error ({e.response.status_code}): {detail}") from e
 
     async def _call_local_ollama(self, user_message: str) -> tuple[str, int]:
         """Call local Ollama's /api/chat endpoint."""
