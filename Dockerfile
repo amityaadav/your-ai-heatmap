@@ -1,5 +1,10 @@
 FROM python:3.12-slim
 
+# Fix locale for UTF-8 support
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    PYTHONUTF8=1
+
 WORKDIR /app
 
 # Install dependencies
