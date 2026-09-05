@@ -26,11 +26,17 @@ One-time setup for the Cloud Run workflow (requires a Google Cloud account):
 1. Create a GCP project and enable the Cloud Run, Cloud Build, and Artifact
    Registry APIs.
 2. Create a service account with the Cloud Run Admin, Cloud Build Editor,
-   Artifact Registry Writer, and Service Account User roles, and generate a
-   JSON key for it.
-3. In the repo's GitHub Settings → Secrets, add:
+   Artifact Registry Writer, and Service Account User roles.
+3. Set up Workload Identity Federation so GitHub Actions can authenticate as
+   that service account without a downloadable JSON key (many GCP projects
+   now block key creation by org policy, and WIF is the recommended
+   approach anyway) — see the commands in
+   `.github/workflows/deploy-cloudrun.yml`'s auth step for what it expects.
+4. In the repo's GitHub Settings → Secrets, add:
    - `GCP_PROJECT_ID` — your GCP project ID
-   - `GCP_SA_KEY` — the service account's JSON key
+   - `GCP_WORKLOAD_IDENTITY_PROVIDER` — full resource name of the WIF
+     provider (`projects/<number>/locations/global/workloadIdentityPools/<pool>/providers/<provider>`)
+   - `GCP_SERVICE_ACCOUNT` — the service account's email
    - `OLLAMA_API_KEY` — your Ollama Cloud key (or adapt the workflow/backend
      to use `OPENROUTER_API_KEY` instead, see `backend/.env.example`)
 
