@@ -374,6 +374,23 @@
     letter-spacing:-.012em;
     margin:0;
   }
+  .btn-retake{
+    all:unset;
+    cursor:pointer;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    padding:4px 10px;
+    border:1px solid var(--ink-3);
+    color:var(--ink-3);
+    transition:background .14s, color .14s, border-color .14s;
+  }
+  .btn-retake:hover{
+    background:var(--ink);
+    color:var(--paper);
+    border-color:var(--ink);
+  }
   .domain-note{
     font-size:12.5px;
     color:var(--ink-3);
@@ -663,6 +680,8 @@ let currentTopic = null;
 let currentDomainIndex = 0;
 let domainOrder = [];      // ordered list of domain names
 let isSubmitting = false;
+let retakeMode = false;
+let retakeDomainName = null;
 
 // ─── Init ───
 function initQuiz() {
@@ -687,9 +706,14 @@ function initQuiz() {
       evaluatedTopics = data.evaluated || [];
       pendingTopics = data.pending || [];
       currentDomainIndex = data.domainIndex || 0;
-      // Filter pending to only topics still in allTopics
+      retakeMode = data.retakeMode || false;
+      retakeDomainName = data.retakeDomainName || null;
       const evalNames = new Set(evaluatedTopics.map(t => t.name));
-      pendingTopics = allTopics.filter(t => !evalNames.has(t.name));
+      if (retakeMode && retakeDomainName) {
+        pendingTopics = allTopics.filter(t => t.domain === retakeDomainName && !evalNames.has(t.name));
+      } else {
+        pendingTopics = allTopics.filter(t => !evalNames.has(t.name));
+      }
     } catch(e) {
       resetState();
     }
@@ -707,6 +731,8 @@ function resetState() {
   evaluatedTopics = [];
   pendingTopics = [...allTopics];
   currentDomainIndex = 0;
+  retakeMode = false;
+  retakeDomainName = null;
   saveState();
 }
 
@@ -715,6 +741,8 @@ function saveState() {
     evaluated: evaluatedTopics,
     pending: pendingTopics,
     domainIndex: currentDomainIndex,
+    retakeMode: retakeMode,
+    retakeDomainName: retakeDomainName,
   }));
   updateSaveIndicator();
 }
@@ -728,8 +756,9 @@ function updateProgress() {
   document.getElementById('progress-count').textContent = `${done} / ${total}`;
   document.getElementById('progress-fill').style.width = pct + '%';
 
-  // Current domain
-  if (pendingTopics.length > 0) {
+  if (retakeMode && retakeDomainName) {
+    document.getElementById('progress-domain').textContent = `Retaking: ${retakeDomainName}`;
+  } else if (pendingTopics.length > 0) {
     document.getElementById('progress-domain').textContent = pendingTopics[0].domain;
   } else {
     document.getElementById('progress-domain').textContent = 'Complete';
@@ -739,24 +768,44 @@ function updateProgress() {
 // ─── Topic navigation ───
 function showNextTopic() {
   if (pendingTopics.length === 0) {
+    if (retakeMode) {
+      retakeMode = false;
+      retakeDomainName = null;
+      saveState();
+      showFinalReveal();
+      return;
+    }
     showFinalReveal();
     return;
   }
 
-  // Check if we've crossed a domain boundary
-  const nextDomain = pendingTopics[0].domain;
-  const nextDomainIdx = domainOrder.indexOf(nextDomain);
-  if (nextDomainIdx > currentDomainIndex && evaluatedTopics.length > 0) {
-    // Show domain summary
-    showDomainSummary(domainOrder[currentDomainIndex]);
-    return;
+  // In retake mode, skip domain boundary logic
+  if (retakeMode) {
+    // All pending topics are from the same domain, just show next
+  } else {
+    // Check if we've crossed a domain boundary
+    const nextDomain = pendingTopics[0].domain;
+    const nextDomainIdx = domainOrder.indexOf(nextDomain);
+    if (nextDomainIdx > currentDomainIndex && evaluatedTopics.length > 0) {
+      showDomainSummary(domainOrder[currentDomainIndex]);
+      return;
+    }
   }
 
   currentTopic = pendingTopics[0];
-  document.getElementById('domain-tag').textContent = currentTopic.domain;
+  document.getElementById('domain-tag').textContent = retakeMode
+    ? `Retaking: ${currentTopic.domain}`
+    : currentTopic.domain;
   document.getElementById('topic-name').textContent = currentTopic.name;
-  document.getElementById('topic-counter').textContent =
-    `${evaluatedTopics.length + 1} of ${allTopics.length} · ${pendingTopics.length} remaining`;
+  if (retakeMode) {
+    const domainTotal = allTopics.filter(t => t.domain === retakeDomainName).length;
+    const domainDone = domainTotal - pendingTopics.length;
+    document.getElementById('topic-counter').textContent =
+      `${domainDone + 1} of ${domainTotal} in this domain · ${pendingTopics.length} remaining`;
+  } else {
+    document.getElementById('topic-counter').textContent =
+      `${evaluatedTopics.length + 1} of ${allTopics.length} · ${pendingTopics.length} remaining`;
+  }
   document.getElementById('explanation').value = '';
   document.getElementById('status').textContent = '';
   document.getElementById('status').className = 'status';
@@ -935,6 +984,21 @@ function skipTopic() {
   showNextTopic();
 }
 
+// ─── Retake a domain ───
+function retakeDomain(domainName) {
+  evaluatedTopics = evaluatedTopics.filter(t => t.domain !== domainName);
+  pendingTopics = allTopics.filter(t => t.domain === domainName);
+  retakeMode = true;
+  retakeDomainName = domainName;
+
+  document.getElementById('reveal-mode').classList.add('hidden');
+  document.getElementById('quiz-mode').classList.remove('hidden');
+
+  saveState();
+  updateProgress();
+  showNextTopic();
+}
+
 // ─── Final reveal ───
 function showFinalReveal() {
   // Score any remaining pending topics as L1
@@ -985,6 +1049,11 @@ function buildHeatmap() {
     const head = document.createElement('div');
     head.className = 'domain-head';
     head.innerHTML = `<h2>${dom.d}</h2><p class="domain-note">${dom.note}</p>`;
+    const retakeBtn = document.createElement('button');
+    retakeBtn.className = 'btn-retake';
+    retakeBtn.textContent = 'Retake';
+    retakeBtn.addEventListener('click', () => retakeDomain(dom.d));
+    head.appendChild(retakeBtn);
 
     const mb = document.createElement('div');
     mb.className = 'microbar';
