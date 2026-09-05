@@ -1,0 +1,761 @@
+{
+  "profileName": "Amit Yadav",
+  "exportedAt": "2026-08-03T00:00:00.000Z",
+  "totalTopics": 143,
+  "evaluatedCount": 143,
+  "domainNotes": {
+    "Foundations & model internals": "Strong for a non-ML-engineer — the NVIDIA labs did real work here.",
+    "Training & model adaptation": "Transfer learning is genuinely strong; the LLM-adaptation half is nearly blank.",
+    "Retrieval & knowledge systems": "You explain RAG better than most people who've built it — but you haven't built it.",
+    "Agents & orchestration": "Your strongest technical territory. MCP in particular is genuine teaching depth.",
+    "Context & interaction engineering": "Teaching-grade on the prompting side; the engineering discipline underneath is thinner.",
+    "Evaluation & reliability": "The single widest gap on this board, and you already know it.",
+    "Security, safety & governance": "Genuinely good threat-model intuition, entirely unvalidated by hands-on testing.",
+    "Infrastructure, serving & LLMOps": "Your AWS depth is real and shipped. The LLM-specific ops layer above it is not.",
+    "Modalities beyond text": "Vision is real via the NVIDIA track. Audio and generative media are sketches.",
+    "Frontier & research directions": "Almost entirely dark. Defensible for a practitioner — until you're in a room with researchers.",
+    "Applied AI & organisational practice": "Your actual moat. Nobody on your engineering side scores here.",
+    "Classical ML, data & engineering craft": "The pre-LLM half of the field is your thinnest area outside frontier research."
+  },
+  "domains": {
+    "Foundations & model internals": {
+      "Neural network fundamentals": {
+        "score": 4,
+        "reasoning": "You didn't stop at 'the loss went down.' You asked what 23.89 signified mathematically and worked through softmax → negative log likelihood. Then you built a visualizer that teaches it to others.",
+        "evidence": "Built: NVIDIA-Deep-Learning-labs digit visualizer · 4-layer PyTorch net with animated activations"
+      },
+      "CNNs & convolution": {
+        "score": 4,
+        "reasoning": "Full transfer-learning lab: frozen VGG16 feature extractor, custom head, then unfreezing. You diagnosed catastrophic forgetting from the learning rate yourself.",
+        "evidence": "NVIDIA DLI certification · Conv2d parameter semantics · coached Swati through the same lab"
+      },
+      "Backprop & gradients": {
+        "score": 3,
+        "reasoning": "Correct on exploding gradients and clipping. Conceptually clean, but you've never implemented a training loop from scratch.",
+        "evidence": "Quiz-level fluency · used utils.py training loops rather than writing them"
+      },
+      "Transformer architecture": {
+        "score": 3,
+        "reasoning": "You can lay out the stack for an audience. It's taught knowledge, not derived knowledge.",
+        "evidence": "Used in BA curriculum · answered advanced-round questions correctly"
+      },
+      "Attention & multi-head attention": {
+        "score": 3,
+        "reasoning": "You correctly identified that multi-head runs parallel projections capturing different relationship types. That's a real answer, not a guess.",
+        "evidence": "Advanced quiz round, five correct in a row"
+      },
+      "Tokens & tokenization": {
+        "score": 4,
+        "reasoning": "Core of your restaurant-analogy glossary. You've explained this to thirty people who'd never heard of it.",
+        "evidence": "BA curriculum · comic strip series"
+      },
+      "Context windows": {
+        "score": 4,
+        "reasoning": "Same — taught, and you reason about it when picking models and sizing prompts.",
+        "evidence": "BA curriculum · model selection conversations"
+      },
+      "Embeddings & vector space": {
+        "score": 3,
+        "reasoning": "The knowledge-graph vs embeddings conversation showed you actually understand what a 1,536-dim space does and doesn't buy you.",
+        "evidence": "Taught in glossary · applied to incident-triage design"
+      },
+      "Pretraining & next-token prediction": {
+        "score": 3,
+        "reasoning": "You've walked others through the pipeline from raw corpus to instruction-following assistant.",
+        "evidence": "AI timeline conversation"
+      },
+      "RLHF & alignment training": {
+        "score": 2,
+        "reasoning": "You've had it explained and can repeat the reward-model → RL loop. You've never touched DPO, constitutional methods, or the tradeoffs.",
+        "evidence": "One conversation, receiving rather than reasoning"
+      },
+      "Sampling params (temperature, top-p)": {
+        "score": 3,
+        "reasoning": "Basic operational fluency; flagged as too basic for your own comic strips.",
+        "evidence": "Considered and rejected as a teaching topic"
+      },
+      "Hallucination & grounding": {
+        "score": 3,
+        "reasoning": "Your chosen next comic topic. You frame it well for a business audience.",
+        "evidence": "Teaching pipeline"
+      },
+      "Reasoning models & chain-of-thought": {
+        "score": 3,
+        "reasoning": "You prompt with it and teach it. The current research on test-time compute and CoT structure hasn't come up.",
+        "evidence": "Curriculum module 3"
+      },
+      "Mixture of Experts": {
+        "score": 2,
+        "reasoning": "Appeared as a line item when you were comparing open models for local inference. No architectural depth.",
+        "evidence": "Model landscape research"
+      },
+      "Quantization (INT4/INT8/GGUF)": {
+        "score": 2,
+        "reasoning": "You understand it as a VRAM lever — 2GB per billion params, Q4 to fit a 34B. Not as a quality/latency tradeoff you've measured.",
+        "evidence": "Local hardware research"
+      },
+      "Scaling laws & their limits": {
+        "score": 2,
+        "reasoning": "Encountered in trend reading. Chinchilla, sub-Chinchilla returns, the compute wall — surface only.",
+        "evidence": "AI trends conversation"
+      },
+      "Open weights & model licensing": {
+        "score": 3,
+        "reasoning": "You did real work here — leaderboard by SWE-bench, open models as a price-floor hedge. That's an informed position.",
+        "evidence": "Local inference economics study for TRP"
+      },
+      "Model distillation": {
+        "score": 2,
+        "reasoning": "Named in passing while comparing model families.",
+        "evidence": "Model landscape research"
+      }
+    },
+    "Training & model adaptation": {
+      "Transfer learning": {
+        "score": 4,
+        "reasoning": "Freeze, train, unfreeze, drop the LR, watch for forgetting. You've done the full cycle and taught it.",
+        "evidence": "VGG16 fruit classifier · diagnosed 1e-4 → 1e-6 fix"
+      },
+      "Loss functions": {
+        "score": 3,
+        "reasoning": "You drew the CrossEntropy vs BCEWithLogits distinction precisely — mutual exclusivity, shape contracts, internal softmax vs sigmoid.",
+        "evidence": "Lab 7 debugging"
+      },
+      "Overfitting & regularization": {
+        "score": 3,
+        "reasoning": "You spotted 97% train / 84% val as overfitting and applied dropout.",
+        "evidence": "Lab 7"
+      },
+      "Data augmentation": {
+        "score": 3,
+        "reasoning": "Configured the transforms and understood why validation doesn't shuffle.",
+        "evidence": "Lab 7"
+      },
+      "Hyperparameter tuning": {
+        "score": 3,
+        "reasoning": "Learning-rate intuition specifically. Not systematic search.",
+        "evidence": "Lab 7"
+      },
+      "LLM fine-tuning (SFT)": {
+        "score": 2,
+        "reasoning": "Discussed as one of three options against RAG and prompting. Never run.",
+        "evidence": "Comic strip topic candidate"
+      },
+      "LoRA / QLoRA / PEFT": {
+        "score": 2,
+        "reasoning": "Appears in your hardware research as a thing a 3090 can do. That's the whole extent.",
+        "evidence": "GPU build research"
+      },
+      "Synthetic data generation": {
+        "score": 2,
+        "reasoning": "Listed in your LLM-capabilities framework. No hands-on.",
+        "evidence": "Training deck framework"
+      },
+      "Dataset curation & labeling": {
+        "score": 1,
+        "reasoning": "Never discussed. You've only used pre-packaged datasets.",
+        "evidence": ""
+      },
+      "Distributed & large-scale training": {
+        "score": 1,
+        "reasoning": "Never discussed.",
+        "evidence": ""
+      },
+      "Reward modeling & RL post-training": {
+        "score": 1,
+        "reasoning": "Never discussed beyond the RLHF summary.",
+        "evidence": ""
+      },
+      "Continual learning": {
+        "score": 1,
+        "reasoning": "Never discussed. Currently one of the loudest 2026 research threads.",
+        "evidence": ""
+      }
+    },
+    "Retrieval & knowledge systems": {
+      "RAG fundamentals": {
+        "score": 3,
+        "reasoning": "You teach it and correctly position it against fine-tuning and prompting. You also questioned whether building one was worth it given managed services — a good instinct that has kept you from building one.",
+        "evidence": "Curriculum · Bedrock Knowledge Bases conversation"
+      },
+      "Knowledge graphs & GraphRAG": {
+        "score": 3,
+        "reasoning": "Your best conceptual conversation in this space. You understood why nearest-neighbour search can't answer 'what upstream services could cause this symptom' and why that pushes toward graph traversal.",
+        "evidence": "Applied directly to incident-triage POC design"
+      },
+      "Chunking strategies": {
+        "score": 2,
+        "reasoning": "Named as the hard problem. You've never tuned one against a retrieval metric.",
+        "evidence": "Conceptual only"
+      },
+      "Vector databases": {
+        "score": 2,
+        "reasoning": "Chroma, FAISS, Pinecone, OpenSearch named. None stood up.",
+        "evidence": "Research only"
+      },
+      "Embedding model selection": {
+        "score": 2,
+        "reasoning": "Mentioned as a lever. No comparison run.",
+        "evidence": "Research only"
+      },
+      "Hybrid search & reranking": {
+        "score": 2,
+        "reasoning": "Appeared in reading on 2026 RAG practice.",
+        "evidence": "Trends reading"
+      },
+      "Retrieval quality evaluation": {
+        "score": 1,
+        "reasoning": "This is the specific gap the fluency assessment called out — 'engineered context assembly with retrieval quality measurement.' Still untouched.",
+        "evidence": "Named as a gap, not closed"
+      },
+      "Managed RAG (Bedrock KB)": {
+        "score": 2,
+        "reasoning": "Researched the build-vs-buy tradeoff. No Bedrock sandbox access to try it.",
+        "evidence": "Blocked by access, not interest"
+      },
+      "Document parsing & extraction": {
+        "score": 2,
+        "reasoning": "Listed in your capability framework.",
+        "evidence": "Framework only"
+      },
+      "Memory & episodic state design": {
+        "score": 2,
+        "reasoning": "AgentCore Memory covered in the full-day training. Nothing built on it.",
+        "evidence": "Bedrock AgentCore training"
+      }
+    },
+    "Agents & orchestration": {
+      "MCP protocol & primitives": {
+        "score": 4,
+        "reasoning": "You've authored servers across stdio and HTTP transports, built a Splunk MCP server at a hackathon, walked through all seven primitives, and correctly argued that an MCP server needs no underlying API. You teach this.",
+        "evidence": "Splunk MCP · SQLite PoC · CLI project · MCP Inspector debugging"
+      },
+      "LangGraph": {
+        "score": 4,
+        "reasoning": "Shipped a production multi-agent system on it and can articulate state merging, fan-out/fan-in, reflection loops, and conditional routing without notes.",
+        "evidence": "Celestial newsletter on Lambda · incident-triage POC"
+      },
+      "Agent architecture patterns": {
+        "score": 3,
+        "reasoning": "Plan/act loops, reflection, critique-driven routing — you designed with these rather than just naming them.",
+        "evidence": "Celestial system design"
+      },
+      "Multi-agent orchestration": {
+        "score": 3,
+        "reasoning": "Three parallel research agents shipped. But parallel multi-agent execution at scale was flagged as a gap, and the six-agent expense system was n8n, not code.",
+        "evidence": "Shipped small, not large"
+      },
+      "Tool use & function calling": {
+        "score": 3,
+        "reasoning": "Central to everything you've built. Solid, unremarkable.",
+        "evidence": "Across all agent work"
+      },
+      "LangChain": {
+        "score": 3,
+        "reasoning": "Actively working through structured tutorials in a local venv, lesson by lesson. In progress, not finished.",
+        "evidence": "Current learning track"
+      },
+      "Agentic coding tools": {
+        "score": 3,
+        "reasoning": "Heavy daily driver across Claude Code and Kiro — steering files, spec mode, auto-running test suites before deploy.",
+        "evidence": "To-do kanban project · incident-triage POC"
+      },
+      "Claude Code advanced features": {
+        "score": 2,
+        "reasoning": "Hooks, subagents, headless mode, checkpointing, Agent SDK — you identified all of them as your highest-leverage gaps and then didn't close them. Scored 2/5 on native features despite topping the MCP-authoring axis.",
+        "evidence": "Explicitly named gap, June audit"
+      },
+      "Bedrock AgentCore": {
+        "score": 2,
+        "reasoning": "Full-day training. Runtime, Memory, Gateway, Identity, Observability — and a sharp Gateway-to-Apigee analogy. Zero hands-on, sandbox blocked.",
+        "evidence": "Training attended, access denied"
+      },
+      "Strands Agents SDK": {
+        "score": 2,
+        "reasoning": "Understood as model-driven orchestration vs LangGraph's explicit graphs. Never run — this is your company's standard, which makes it the most expensive gap on this board.",
+        "evidence": "Conceptual only"
+      },
+      "No-code agent platforms": {
+        "score": 3,
+        "reasoning": "Built a six-agent expense tracking system in n8n end to end.",
+        "evidence": "Shipped"
+      },
+      "Human-in-the-loop design": {
+        "score": 3,
+        "reasoning": "You argue for review gates on risky actions and understand why bounded tasks beat open-ended chat.",
+        "evidence": "Trends conversation, applied thinking"
+      },
+      "Agent identity & permission scoping": {
+        "score": 2,
+        "reasoning": "You've named agent identity sprawl as a threat. You haven't designed a scoping model.",
+        "evidence": "AMA security prep"
+      },
+      "Agent-to-agent protocols": {
+        "score": 1,
+        "reasoning": "A2A and the coordination-protocol layer haven't come up.",
+        "evidence": ""
+      },
+      "Long-horizon task execution": {
+        "score": 2,
+        "reasoning": "Read about 8-hour agent workflows. Your own agents run in minutes.",
+        "evidence": "Trends reading"
+      }
+    },
+    "Context & interaction engineering": {
+      "Prompt engineering": {
+        "score": 4,
+        "reasoning": "You designed a six-module curriculum for thirty BAs, built the mental model (briefing a context-blind collaborator), ran a pre-session poll, and the comic landed. This is unambiguously teaching depth.",
+        "evidence": "Delivered to 30 BAs · comic strip series"
+      },
+      "Few-shot & CoT prompting": {
+        "score": 4,
+        "reasoning": "Module 3 of your own curriculum, with BA-specific applications.",
+        "evidence": "Curriculum"
+      },
+      "System prompt & role design": {
+        "score": 3,
+        "reasoning": "You use it deliberately and teach RCTFC-style structure.",
+        "evidence": "Curriculum"
+      },
+      "Context engineering": {
+        "score": 3,
+        "reasoning": "You correctly see it as the successor framing to prompt engineering and picked it as a comic topic. The measured version — assembling context and proving it improved things — isn't there.",
+        "evidence": "Named topic, unmeasured practice"
+      },
+      "Prompt libraries & reuse": {
+        "score": 3,
+        "reasoning": "Actively building a living library tied to real TRP artifacts. That's the right instinct and it's in flight.",
+        "evidence": "In progress at TRP"
+      },
+      "Structured outputs & schema validation": {
+        "score": 2,
+        "reasoning": "Called out as a gap: structured output validation with repair loops. Still open.",
+        "evidence": "Named gap"
+      },
+      "Prompt versioning as tested artifacts": {
+        "score": 2,
+        "reasoning": "Same assessment, same status. Treating prompts as code you regression-test hasn't started.",
+        "evidence": "Named gap"
+      },
+      "Prompt caching & cost optimisation": {
+        "score": 2,
+        "reasoning": "You reason about token cost at the model-selection level, not the cache level.",
+        "evidence": "Adjacent knowledge"
+      }
+    },
+    "Evaluation & reliability": {
+      "Eval fundamentals & golden datasets": {
+        "score": 2,
+        "reasoning": "You researched the courses thoroughly — Hamel and Shreya's Maven cohort, the DeepLearning.AI/Arize option — and identified this as the top gap. Research is not the same as having run one.",
+        "evidence": "Gap identified July 2026, unclosed"
+      },
+      "LLM-as-judge": {
+        "score": 2,
+        "reasoning": "You listed it as a capability in your teaching framework. Never implemented.",
+        "evidence": "Framework only"
+      },
+      "Trace-level observability for agents": {
+        "score": 2,
+        "reasoning": "Named as a gap: 'every run leaves an inspectable trace.' Your agents don't yet.",
+        "evidence": "Named gap"
+      },
+      "Error analysis & failure taxonomies": {
+        "score": 2,
+        "reasoning": "You know the method — group failure modes, fix what matters first. Untried.",
+        "evidence": "Course research"
+      },
+      "Regression testing for agents": {
+        "score": 2,
+        "reasoning": "You built auto-running test suites for deterministic code, which is real. Non-deterministic agent output is a different problem you haven't tackled.",
+        "evidence": "Adjacent skill, not transferred"
+      },
+      "Benchmarks (SWE-bench, agentic evals)": {
+        "score": 3,
+        "reasoning": "You built a model leaderboard by SWE-bench score as part of the TCO work — you can explain what these measure and where they mislead.",
+        "evidence": "Local inference study"
+      },
+      "Cost & latency benchmarking": {
+        "score": 3,
+        "reasoning": "Three-year TCO across hardware tiers, ending in a model-routing recommendation rather than a hardware buy. That's a defensible piece of analysis.",
+        "evidence": "TRP local inference study"
+      },
+      "Guardrails & output filtering": {
+        "score": 2,
+        "reasoning": "Named in your framework and in the security conversations. Nothing implemented.",
+        "evidence": "Conceptual"
+      },
+      "Classical NLP metrics (BLEU/COMET)": {
+        "score": 2,
+        "reasoning": "One conversation covering BLEU, METEOR, chrF, BERTScore, COMET, MQM. You received it rather than applied it.",
+        "evidence": "Single conversation"
+      },
+      "Uncertainty & calibration": {
+        "score": 1,
+        "reasoning": "Never discussed.",
+        "evidence": ""
+      }
+    },
+    "Security, safety & governance": {
+      "Prompt injection (direct & indirect)": {
+        "score": 3,
+        "reasoning": "Your best security thinking. You landed on the point that internal agents are more exposed to indirect injection precisely because they ingest trusted internal documents — and you got there partly by arguing against yourself.",
+        "evidence": "AMA prep · red-team agent concept"
+      },
+      "Entitlement flattening in RAG": {
+        "score": 3,
+        "reasoning": "You raised this specifically. Most people building RAG have never considered it.",
+        "evidence": "AMA prep"
+      },
+      "Shadow AI & agent inventory": {
+        "score": 3,
+        "reasoning": "You designed a discovery layer for finding undeclared agent deployments. Strong instinct for where the real risk sits.",
+        "evidence": "Agent Security Evaluator concept"
+      },
+      "Deepfake & social engineering threats": {
+        "score": 3,
+        "reasoning": "Covered as the inbound half of the AI threat picture.",
+        "evidence": "AMA prep"
+      },
+      "Agent red-teaming in practice": {
+        "score": 2,
+        "reasoning": "You know Garak, PyRIT, Lakera, Mindgard exist and what they do. You've run none of them.",
+        "evidence": "Market research"
+      },
+      "OWASP LLM Top 10 / MITRE ATLAS": {
+        "score": 2,
+        "reasoning": "Named as the mapping targets for your compliance layer. Not worked through.",
+        "evidence": "Concept design"
+      },
+      "AI regulation — financial services": {
+        "score": 3,
+        "reasoning": "FINRA's 2026 oversight report, SEC exam priorities, the 40%/44% adoption-vs-validation gap. You cite real numbers, which is rare.",
+        "evidence": "Applied to TRP context repeatedly"
+      },
+      "AI governance frameworks (NIST, ISO 42001)": {
+        "score": 2,
+        "reasoning": "AIGP identified as your accessible next certification. Frameworks not yet studied.",
+        "evidence": "Certification research"
+      },
+      "EU AI Act & global policy": {
+        "score": 1,
+        "reasoning": "Hasn't come up. Notable given TRP's global footprint.",
+        "evidence": ""
+      },
+      "Model safety & alignment research": {
+        "score": 2,
+        "reasoning": "You engage with it as context, not as a field you track.",
+        "evidence": "Trends reading"
+      },
+      "Mechanistic interpretability": {
+        "score": 1,
+        "reasoning": "Never discussed. SAEs, activation steering, Anthropic's natural-language autoencoder work — all absent.",
+        "evidence": ""
+      },
+      "Privacy & PII handling in AI systems": {
+        "score": 2,
+        "reasoning": "Present in your compliance reasoning but never designed for concretely.",
+        "evidence": "Adjacent"
+      },
+      "Supply chain risk (MCP servers, deps)": {
+        "score": 3,
+        "reasoning": "You flagged MCP servers as a supply-chain surface — and you're one of the few people who authors them, so you know what you're describing.",
+        "evidence": "AMA prep"
+      }
+    },
+    "Infrastructure, serving & LLMOps": {
+      "AWS core (IAM, Lambda, ECS/Fargate, SQS)": {
+        "score": 4,
+        "reasoning": "SpecSync is a real deployed system — multi-environment stacks, queue-driven Fargate services, the whole shape.",
+        "evidence": "SpecSync · celestial newsletter on Lambda"
+      },
+      "Infrastructure as code (CDK)": {
+        "score": 4,
+        "reasoning": "Python CDK with L3 constructs, parameterised per-environment config, artifact promotion from stage to prod.",
+        "evidence": "SpecSync multi-env stacks"
+      },
+      "CI/CD pipelines": {
+        "score": 3,
+        "reasoning": "GitHub Actions with OIDC federation, GitLab CI mechanics, immutable git-SHA image tags, manual approval gates.",
+        "evidence": "Celestial · SpecSync"
+      },
+      "Docker & containers": {
+        "score": 3,
+        "reasoning": "You reasoned your own way to the right answer — the value is dependency consistency and an immutable versioned artifact, not cloud portability — and then built a teaching poster from it.",
+        "evidence": "VM/Docker/K8s poster · Fargate deployments"
+      },
+      "Kubernetes": {
+        "score": 2,
+        "reasoning": "Correct mental model (orchestration layer above containers, doesn't replace Docker) but deliberately deprioritised and never run.",
+        "evidence": "Poster only, by your own sequencing"
+      },
+      "Local inference (Ollama, LM Studio)": {
+        "score": 3,
+        "reasoning": "Running locally on the M5, and you debugged a real one — Metal shader / bfloat16 incompatibility, fixed by pinning Ollama 0.18.0.",
+        "evidence": "M5 MacBook, hands-on debugging"
+      },
+      "High-throughput serving (vLLM)": {
+        "score": 2,
+        "reasoning": "Named as the production-serving tier in your research. Not run.",
+        "evidence": "Research"
+      },
+      "GPU hardware & VRAM economics": {
+        "score": 3,
+        "reasoning": "VRAM-per-parameter rules, PCIe bottlenecks on dual 3090s, NVLink limits, TOPS comparisons across cards. Well-researched.",
+        "evidence": "Desktop build study"
+      },
+      "Model routing architecture": {
+        "score": 3,
+        "reasoning": "Your own conclusion from the TCO work, and the right one — route across tiers rather than own hardware.",
+        "evidence": "TRP local inference study"
+      },
+      "Cost management & AI FinOps": {
+        "score": 3,
+        "reasoning": "You run projects at roughly fifty cents a month and know why. You switched to Haiku for cost reasons deliberately.",
+        "evidence": "Celestial · Hermes work"
+      },
+      "Observability (Splunk, CloudWatch)": {
+        "score": 3,
+        "reasoning": "Splunk MCP server, a CloudWatch analysis agent, Splunk query design over 24h/30d windows in the triage POC.",
+        "evidence": "Multiple projects"
+      },
+      "API gateway patterns": {
+        "score": 3,
+        "reasoning": "You mapped AgentCore Gateway onto TRP's existing Apigee layer unprompted — that's the architect move.",
+        "evidence": "AgentCore training"
+      },
+      "LLMOps platforms & model registry": {
+        "score": 1,
+        "reasoning": "Never discussed. No model versioning, promotion, or registry practice.",
+        "evidence": ""
+      },
+      "Feature stores & ML pipelines": {
+        "score": 1,
+        "reasoning": "Never discussed.",
+        "evidence": ""
+      },
+      "Edge & on-device inference": {
+        "score": 2,
+        "reasoning": "Noted that Gemma 4 12B runs in 16GB with vision and voice. Interest, not practice.",
+        "evidence": "Trends reading"
+      }
+    },
+    "Modalities beyond text": {
+      "Image classification & vision": {
+        "score": 3,
+        "reasoning": "MNIST end to end in the browser, plus the VGG16 fruit classifier. The best lesson you drew was about train/serve skew — replicating the preprocessing pipeline exactly.",
+        "evidence": "Digit visualizer · DLI labs"
+      },
+      "NLP & named entity recognition": {
+        "score": 3,
+        "reasoning": "Covered in the DLI coursework.",
+        "evidence": "NVIDIA DLI NLP/NER labs"
+      },
+      "Speech-to-text": {
+        "score": 2,
+        "reasoning": "You scaffolded a whisper.cpp pipeline with VAD-gated mic capture. Designed, not run.",
+        "evidence": "voice_twin.py scaffold"
+      },
+      "Text-to-speech & voice cloning": {
+        "score": 2,
+        "reasoning": "StyleTTS2 / XTTS-v2 chosen, sentence-boundary streaming designed to hide latency. Same status — scaffolded.",
+        "evidence": "voice_twin.py scaffold"
+      },
+      "Vision-language models": {
+        "score": 2,
+        "reasoning": "Qwen3-VL, Llama 3.2 Vision named in model research.",
+        "evidence": "Research"
+      },
+      "Multimodal architecture": {
+        "score": 2,
+        "reasoning": "You teach 'vision encoders fused with LLMs' as a line in a table. That's the depth.",
+        "evidence": "Curriculum table"
+      },
+      "Diffusion & image generation": {
+        "score": 2,
+        "reasoning": "One row in one comparison table. Nothing beyond it.",
+        "evidence": "Passing mention"
+      },
+      "Video generation": {
+        "score": 1,
+        "reasoning": "Never discussed beyond naming Sora once.",
+        "evidence": ""
+      },
+      "OCR & document AI": {
+        "score": 2,
+        "reasoning": "Receipt scanning was an agent in the expense concept, but the OCR itself was never the subject.",
+        "evidence": "Adjacent"
+      },
+      "Audio & music generation": {
+        "score": 1,
+        "reasoning": "Never discussed.",
+        "evidence": ""
+      }
+    },
+    "Frontier & research directions": {
+      "Test-time compute & reasoning scaling": {
+        "score": 2,
+        "reasoning": "Encountered in trends reading.",
+        "evidence": "Trends"
+      },
+      "World models & JEPA": {
+        "score": 1,
+        "reasoning": "Never discussed. Over $2B has moved into this thesis in six months.",
+        "evidence": ""
+      },
+      "Physical AI & robotics": {
+        "score": 2,
+        "reasoning": "Named as where new capital is going. No engagement.",
+        "evidence": "Trends"
+      },
+      "Neuro-symbolic & hybrid AI": {
+        "score": 2,
+        "reasoning": "Your knowledge-graph-plus-embeddings reasoning is the applied edge of this, though you didn't name it as such.",
+        "evidence": "Implicit"
+      },
+      "Federated learning": {
+        "score": 1,
+        "reasoning": "Never discussed.",
+        "evidence": ""
+      },
+      "Green AI & energy constraints": {
+        "score": 2,
+        "reasoning": "You engaged with the power-not-capital argument — interconnection queues, capacity slipping to 2028.",
+        "evidence": "Trends conversation"
+      },
+      "AI economics & compute markets": {
+        "score": 3,
+        "reasoning": "The TCO study plus the capex/power reading gives you a genuine position on where cost pressure comes from.",
+        "evidence": "TRP study · trends"
+      },
+      "Agentic RL & training environments": {
+        "score": 1,
+        "reasoning": "Never discussed. This is where a lot of 2026 capability work sits.",
+        "evidence": ""
+      },
+      "Self-improving & recursive systems": {
+        "score": 1,
+        "reasoning": "Never discussed.",
+        "evidence": ""
+      },
+      "AGI timelines & macro forecasting": {
+        "score": 2,
+        "reasoning": "Peripheral awareness only.",
+        "evidence": "Trends"
+      }
+    },
+    "Applied AI & organisational practice": {
+      "AI adoption strategy": {
+        "score": 4,
+        "reasoning": "Tools-first sequencing for BAs — Jira/Confluence agents, then Copilot, then the proprietary LLM interface — with measurement of behaviour change rather than licence counts. That's a real strategy.",
+        "evidence": "30-BA programme at TRP"
+      },
+      "AI education & curriculum design": {
+        "score": 4,
+        "reasoning": "Six-module curriculum, pre-session polling, weekly comics, and the self-awareness to notice the MCP session was too technical and diagnose it as a sequencing and curse-of-knowledge problem.",
+        "evidence": "Delivered, iterated, corrected"
+      },
+      "Use case identification & prioritisation": {
+        "score": 4,
+        "reasoning": "The regulatory-change-impact and data-lineage agent ideas were good precisely because you know which processes matter — an engineer couldn't have picked them.",
+        "evidence": "Enterprise agent ideation"
+      },
+      "Requirements to architecture translation": {
+        "score": 4,
+        "reasoning": "This is the BA-to-architect bridge you're actively walking, with steering files and test plans as the mechanism.",
+        "evidence": "POC practice at TRP"
+      },
+      "AI in asset management": {
+        "score": 4,
+        "reasoning": "ETF NAV/price mechanics, AP arbitrage, EMEA market structure, identifier hierarchy, return metrics. Deep, and it's the context everything else attaches to.",
+        "evidence": "Domain work"
+      },
+      "Change management & measuring adoption": {
+        "score": 3,
+        "reasoning": "You're pushing toward time studies and adoption metrics as evidence. Not yet produced.",
+        "evidence": "In progress"
+      },
+      "Build vs buy evaluation": {
+        "score": 3,
+        "reasoning": "You questioned whether to build RAG given managed services, and whether to own hardware given routing. You ask the right question consistently.",
+        "evidence": "Repeated pattern"
+      },
+      "Stakeholder communication & buy-in": {
+        "score": 3,
+        "reasoning": "You prepare for rooms — the AMA questions were built to be non-dodgeable, and you thought about political dynamics before content.",
+        "evidence": "AMA prep · Nagendra 1:1"
+      },
+      "Explaining AI to non-technical audiences": {
+        "score": 4,
+        "reasoning": "The restaurant analogy, the dating-trust analogy for the panel, the comic strips. This is a distinct skill and you have it.",
+        "evidence": "Multiple formats, real audiences"
+      },
+      "Portfolio & career positioning": {
+        "score": 3,
+        "reasoning": "Deliberate about it — projects as evidence, honest about 'shipped agents at scale' being the gap.",
+        "evidence": "Ongoing"
+      }
+    },
+    "Classical ML, data & engineering craft": {
+      "Python": {
+        "score": 3,
+        "reasoning": "Shipping real code after a fifteen-year gap. Reading and debugging faster than writing from scratch, and honest about that.",
+        "evidence": "Active daily practice"
+      },
+      "Git & version control": {
+        "score": 3,
+        "reasoning": "Reset, restore, checkout from remote, commit conventions — working fluency.",
+        "evidence": "Daily"
+      },
+      "SQL & data modelling": {
+        "score": 3,
+        "reasoning": "Career-long BA competence.",
+        "evidence": "Professional background"
+      },
+      "Supervised learning basics": {
+        "score": 3,
+        "reasoning": "Covered properly through DLI.",
+        "evidence": "NVIDIA DLI"
+      },
+      "Unsupervised learning & clustering": {
+        "score": 2,
+        "reasoning": "Mentioned as an embedding use case. Never practised.",
+        "evidence": "Adjacent"
+      },
+      "Statistical inference & experiment design": {
+        "score": 2,
+        "reasoning": "You reason about metrics but haven't designed a controlled experiment. Directly relevant to proving your adoption programme worked.",
+        "evidence": "Gap with immediate business value"
+      },
+      "Time series forecasting": {
+        "score": 1,
+        "reasoning": "Never discussed — surprising given asset management.",
+        "evidence": ""
+      },
+      "Recommender systems": {
+        "score": 1,
+        "reasoning": "Never discussed.",
+        "evidence": ""
+      },
+      "Feature engineering": {
+        "score": 1,
+        "reasoning": "Never discussed.",
+        "evidence": ""
+      },
+      "Data engineering pipelines": {
+        "score": 2,
+        "reasoning": "SpecSync syncs artifacts rather than moving data at volume. Not the same discipline.",
+        "evidence": "Adjacent"
+      },
+      "Explainable AI (SHAP, LIME)": {
+        "score": 1,
+        "reasoning": "Never discussed. Relevant to a regulated firm.",
+        "evidence": ""
+      },
+      "Frontend & data visualisation": {
+        "score": 3,
+        "reasoning": "The digit visualizer, the posters, the interactive frameworks. You build things people can look at.",
+        "evidence": "Multiple artifacts"
+      }
+    }
+  }
+}

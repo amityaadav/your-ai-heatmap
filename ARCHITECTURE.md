@@ -66,9 +66,15 @@ The LLM receives the full list of remaining topics alongside the user's explanat
 - Generates the final heatmap by injecting scores into the original `index.html` template
 
 ### `index.html` — Static Heatmap
-- Pre-scored heatmap with hardcoded `DOMAINS` array (Amit's own scores)
+- Loads Amit's scores from `assets/data/amit-profile.json` on page load (fetched via `fetch()`)
 - Design gold standard — quiz.html mirrors its visual style
-- Read-only display, no localStorage
+- **Score toggle**: if the viewer has localStorage quiz data, a toggle switches between Amit's scores and theirs
+- **Topic retake**: clicking a cell shows a "Retake this topic" link that opens `quiz.html?retake=TopicName`
+
+### `assets/data/amit-profile.json` — Canonical Profile
+- Amit's pre-scored profile in the same JSON format as quiz export: `{profileName, exportedAt, totalTopics, evaluatedCount, domainNotes, domains}`
+- Editable directly on GitHub — update a score, push, and the dashboard reflects it on next page load
+- `domainNotes` is a lightweight extension (domain → note string) for the dashboard's per-domain commentary
 
 ### `assets/js/data.js` — Shared Data
 - Contains the `DOMAINS` array (143 topics across 12 domains) used by `quiz.html`
@@ -86,8 +92,10 @@ your-ai-heatmap/
 ├── quiz.html               # Interactive quiz SPA with session persistence
 ├── Dockerfile              # Container for Cloud Run deployment
 ├── assets/
+│   ├── data/
+│   │   └── amit-profile.json  # Amit's scores (canonical, editable on GitHub)
 │   └── js/
-│       └── data.js         # 143 topics shared between index.html and quiz.html
+│       └── data.js            # 143 topics shared between index.html and quiz.html
 ├── backend/
 │   ├── main.py             # FastAPI app (serves API + static files)
 │   ├── sensing_engine.py   # LLM evaluator (Ollama Cloud / OpenRouter / local)
