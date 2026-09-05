@@ -694,6 +694,7 @@ let domainOrder = [];      // ordered list of domain names
 let isSubmitting = false;
 let retakeMode = false;
 let retakeDomainName = null;
+let retakeTopicName = null;
 
 // ─── Init ───
 function initQuiz() {
@@ -733,6 +734,23 @@ function initQuiz() {
     resetState();
   }
 
+  // Check for ?retake=TopicName from the dashboard
+  const params = new URLSearchParams(window.location.search);
+  const retakeTopic = params.get('retake');
+  if (retakeTopic) {
+    const topic = allTopics.find(t => t.name === retakeTopic);
+    if (topic) {
+      evaluatedTopics = evaluatedTopics.filter(t => t.name !== retakeTopic);
+      pendingTopics = [topic];
+      retakeMode = true;
+      retakeTopicName = retakeTopic;
+      retakeDomainName = null;
+      saveState();
+      // Clear the URL param so refresh doesn't re-trigger
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }
+
   document.getElementById('n-topics').textContent = `${allTopics.length} topics`;
   updateProgress();
   updateSaveIndicator();
@@ -745,6 +763,7 @@ function resetState() {
   currentDomainIndex = 0;
   retakeMode = false;
   retakeDomainName = null;
+  retakeTopicName = null;
   saveState();
 }
 
@@ -783,6 +802,7 @@ function showNextTopic() {
     if (retakeMode) {
       retakeMode = false;
       retakeDomainName = null;
+      retakeTopicName = null;
       saveState();
       showFinalReveal();
       return;
@@ -809,7 +829,9 @@ function showNextTopic() {
     ? `Retaking: ${currentTopic.domain}`
     : currentTopic.domain;
   document.getElementById('topic-name').textContent = currentTopic.name;
-  if (retakeMode) {
+  if (retakeMode && retakeTopicName) {
+    document.getElementById('topic-counter').textContent = `Retaking 1 topic from ${currentTopic.domain}`;
+  } else if (retakeMode && retakeDomainName) {
     const domainTotal = allTopics.filter(t => t.domain === retakeDomainName).length;
     const domainDone = domainTotal - pendingTopics.length;
     document.getElementById('topic-counter').textContent =

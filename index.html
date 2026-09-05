@@ -288,6 +288,21 @@
     color:var(--ink-3);border-top:1px solid var(--rule);padding-top:11px;margin:0;
   }
   .rail .ev b{color:var(--ink-2);font-weight:600}
+  .retake-link{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    text-decoration:none;
+    padding:6px 14px;
+    margin-top:14px;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    transition:background .14s;
+  }
+  .retake-link:hover{background:var(--ink-2)}
 
   /* ---------- closing ---------- */
   .method{
@@ -369,6 +384,7 @@
       <div class="band" id="r-band" hidden><i></i><span></span></div>
       <p class="why" id="r-why">Every square carries the specific reason it landed where it did — what you built, what you only asked about, and what has never come up at all.</p>
       <p class="ev" id="r-ev"></p>
+      <a id="r-retake" href="#" class="retake-link" hidden>Retake this topic</a>
     </aside>
   </div>
 
@@ -705,6 +721,7 @@ const rBand  = document.getElementById('r-band');
 const rWhy   = document.getElementById('r-why');
 const rEv    = document.getElementById('r-ev');
 
+const rRetake = document.getElementById('r-retake');
 function show(name,lvl,why,ev,dom){
   rTitle.textContent = name;
   rBand.hidden = false;
@@ -712,6 +729,8 @@ function show(name,lvl,why,ev,dom){
   rBand.querySelector('span').textContent = `${lvl} · ${LV[lvl].name}`;
   rWhy.textContent = why;
   rEv.innerHTML = ev ? `<b>Evidence</b> — ${ev}<br><b>Domain</b> — ${dom}` : `<b>Evidence</b> — none in the record.<br><b>Domain</b> — ${dom}`;
+  rRetake.href = `quiz.html?retake=${encodeURIComponent(name)}`;
+  rRetake.hidden = false;
 }
 function select(btn,name,lvl,why,ev,dom){
   document.querySelectorAll('.cell.sel').forEach(c=>c.classList.remove('sel'));
