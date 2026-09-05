@@ -380,7 +380,7 @@
   </p>
 
   <div class="nav-row">
-    <a href="quiz.html">Take the quiz yourself</a>
+    <a href="quiz.html">Take the quiz</a>
     <button id="btn-toggle" class="view-toggle" onclick="toggleView()" hidden>View your scores</button>
   </div>
 
@@ -733,9 +733,9 @@ function renderHeatmap() {
     cells.className = 'cells';
     dom.t.forEach(([name,origLvl,origWhy,origEv])=>{
       const entry = lookup ? lookup[name] : null;
-      const lvl = entry ? entry.score : origLvl;
-      const why = entry ? entry.reasoning : origWhy;
-      const ev = entry ? (entry.evidence || '') : origEv;
+      const lvl = lookup ? (entry ? entry.score : 1) : origLvl;
+      const why = lookup ? (entry ? entry.reasoning : 'Not yet evaluated — take the quiz to score this topic.') : origWhy;
+      const ev = lookup ? (entry ? (entry.evidence || '') : '') : origEv;
 
       const b = document.createElement('button');
       b.className = 'cell';
