@@ -100,6 +100,22 @@
     color:var(--ink);
   }
   .nav-row a.secondary:hover{background:var(--paper)}
+  .view-toggle{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    text-decoration:none;
+    padding:12px 24px;
+    border:1px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    cursor:pointer;
+    transition:background .14s, color .14s;
+  }
+  .view-toggle:hover{background:var(--paper)}
+  .view-toggle.active{background:var(--L4);color:var(--L4-ink);border-color:var(--L4)}
 
   /* ---------- signature: spectrum ribbon ---------- */
   .ribbon-block{margin:0 0 12px}
@@ -350,8 +366,8 @@
 
   <div class="eyebrow">
     <span>Knowledge survey</span>
-    <span>Amit Yadav</span>
-    <span>Compiled 03 Aug 2026</span>
+    <span id="view-name">Amit Yadav</span>
+    <span id="view-date">Compiled 03 Aug 2026</span>
     <span id="n-topics">— topics</span>
     <span>Topics curated from AI/ML curricula, certifications & industry research (2025–2026)</span>
   </div>
@@ -365,6 +381,7 @@
 
   <div class="nav-row">
     <a href="quiz.html">Take the quiz yourself</a>
+    <button id="btn-toggle" class="view-toggle" onclick="toggleView()" hidden>View your scores</button>
   </div>
 
   <div class="ribbon-block">
@@ -411,6 +428,43 @@ const LV = {
   3:{name:"Can explain",     desc:"Solid enough to teach a peer",       css:"--L3"},
   4:{name:"Can teach / built",desc:"Built with it or taught it",        css:"--L4"}
 };
+
+let showingUserScores = false;
+let userQuizData = null;
+
+function getQuizData() {
+  try {
+    const saved = localStorage.getItem('ai-heatmap-quiz');
+    if (!saved) return null;
+    const data = JSON.parse(saved);
+    if (!data.evaluated || data.evaluated.length === 0) return null;
+    return data;
+  } catch(e) { return null; }
+}
+
+function buildLookup(quizData) {
+  const lookup = {};
+  quizData.evaluated.forEach(t => { lookup[t.name] = t; });
+  return lookup;
+}
+
+function toggleView() {
+  showingUserScores = !showingUserScores;
+  const btn = document.getElementById('btn-toggle');
+  if (showingUserScores) {
+    btn.textContent = "View Amit's scores";
+    btn.classList.add('active');
+    document.getElementById('view-name').textContent = 'Your scores';
+    document.getElementById('view-date').textContent =
+      'From quiz · ' + userQuizData.evaluated.length + ' topics evaluated';
+  } else {
+    btn.textContent = 'View your scores';
+    btn.classList.remove('active');
+    document.getElementById('view-name').textContent = 'Amit Yadav';
+    document.getElementById('view-date').textContent = 'Compiled 03 Aug 2026';
+  }
+  renderHeatmap();
+}
 
 const DOMAINS = [
   {
@@ -632,87 +686,109 @@ const DOMAINS = [
 
 /* ---------- build ---------- */
 const matrix = document.getElementById('matrix');
-const counts = {1:0,2:0,3:0,4:0};
-let total = 0;
-
-DOMAINS.forEach((dom, di)=>{
-  const local = {1:0,2:0,3:0,4:0};
-  dom.t.forEach(t=>{ local[t[1]]++; counts[t[1]]++; total++; });
-
-  const sec = document.createElement('section');
-  sec.className = 'domain';
-
-  const head = document.createElement('div');
-  head.className = 'domain-head';
-  head.innerHTML = `<h2>${dom.d}</h2><p class="domain-note">${dom.note}</p>`;
-
-  const mb = document.createElement('div');
-  mb.className = 'microbar';
-  mb.setAttribute('role','img');
-  mb.setAttribute('aria-label',
-    `${dom.t.length} topics: ${local[4]} built or taught, ${local[3]} can explain, ${local[2]} heard of, ${local[1]} untouched`);
-  [4,3,2,1].forEach(l=>{
-    if(!local[l]) return;
-    const i = document.createElement('i');
-    i.style.flex = local[l];
-    i.style.background = `var(${LV[l].css})`;
-    mb.appendChild(i);
-  });
-  head.appendChild(mb);
-  sec.appendChild(head);
-
-  const cells = document.createElement('div');
-  cells.className = 'cells';
-  dom.t.forEach(([name,lvl,why,ev])=>{
-    const b = document.createElement('button');
-    b.className = 'cell';
-    b.dataset.lvl = lvl;
-    b.innerHTML = `<span class="lvl">${lvl}</span>${name}`;
-    b.setAttribute('aria-label', `${name} — level ${lvl}, ${LV[lvl].name}`);
-    b.addEventListener('click', ()=>select(b,name,lvl,why,ev,dom.d));
-    b.addEventListener('mouseenter', ()=>{ if(window.innerWidth>1080) show(name,lvl,why,ev,dom.d); });
-    cells.appendChild(b);
-  });
-  sec.appendChild(cells);
-  matrix.appendChild(sec);
-});
-
-document.getElementById('n-topics').textContent = `${total} topics`;
-
-/* ribbon */
 const ribbon = document.getElementById('ribbon');
-[4,3,2,1].forEach(l=>{
-  const seg = document.createElement('div');
-  seg.className = 'ribbon-seg';
-  seg.style.flexGrow = counts[l];
-  seg.style.background = `var(${LV[l].css})`;
-  seg.style.color = `var(${LV[l].css}-ink)`;
-  const pct = Math.round(counts[l]/total*100);
-  seg.innerHTML = `<b>${counts[l]}</b><span>${LV[l].name} · ${pct}%</span>`;
-  ribbon.appendChild(seg);
-});
-/* explicit ink colours (CSS vars for ink are separate names) */
-[...ribbon.children].forEach((seg,i)=>{
-  const l = [4,3,2,1][i];
-  seg.style.color = getComputedStyle(document.documentElement).getPropertyValue(`--L${l}-ink`);
-});
-
-/* legend + filter */
 const legend = document.getElementById('legend');
 let activeFilter = null;
-[1,2,3,4].forEach(l=>{
-  const b = document.createElement('button');
-  b.setAttribute('aria-pressed','false');
-  b.innerHTML = `<span class="sw"><i class="chip" style="background:var(${LV[l].css})"></i>${l} · ${LV[l].name}</span><span class="desc">${LV[l].desc} — ${counts[l]} topics</span>`;
-  b.addEventListener('click', ()=>{
-    activeFilter = (activeFilter===l) ? null : l;
-    [...legend.children].forEach((x,i)=>x.setAttribute('aria-pressed', String(activeFilter===i+1)));
-    document.querySelectorAll('.cell').forEach(c=>{
-      c.classList.toggle('dim', activeFilter!==null && +c.dataset.lvl!==activeFilter);
+
+function renderHeatmap() {
+  const lookup = (showingUserScores && userQuizData) ? buildLookup(userQuizData) : null;
+  matrix.innerHTML = '';
+  ribbon.innerHTML = '';
+  legend.innerHTML = '';
+  activeFilter = null;
+
+  const counts = {1:0,2:0,3:0,4:0};
+  let total = 0;
+
+  DOMAINS.forEach((dom, di)=>{
+    const local = {1:0,2:0,3:0,4:0};
+    dom.t.forEach(t=>{
+      const score = lookup ? (lookup[t[0]]?.score || 1) : t[1];
+      local[score]++; counts[score]++; total++;
     });
+
+    const sec = document.createElement('section');
+    sec.className = 'domain';
+
+    const head = document.createElement('div');
+    head.className = 'domain-head';
+    head.innerHTML = `<h2>${dom.d}</h2><p class="domain-note">${dom.note}</p>`;
+
+    const mb = document.createElement('div');
+    mb.className = 'microbar';
+    mb.setAttribute('role','img');
+    mb.setAttribute('aria-label',
+      `${dom.t.length} topics: ${local[4]} built or taught, ${local[3]} can explain, ${local[2]} heard of, ${local[1]} untouched`);
+    [4,3,2,1].forEach(l=>{
+      if(!local[l]) return;
+      const i = document.createElement('i');
+      i.style.flex = local[l];
+      i.style.background = `var(${LV[l].css})`;
+      mb.appendChild(i);
+    });
+    head.appendChild(mb);
+    sec.appendChild(head);
+
+    const cells = document.createElement('div');
+    cells.className = 'cells';
+    dom.t.forEach(([name,origLvl,origWhy,origEv])=>{
+      const entry = lookup ? lookup[name] : null;
+      const lvl = entry ? entry.score : origLvl;
+      const why = entry ? entry.reasoning : origWhy;
+      const ev = entry ? (entry.evidence || '') : origEv;
+
+      const b = document.createElement('button');
+      b.className = 'cell';
+      b.dataset.lvl = lvl;
+      b.innerHTML = `<span class="lvl">${lvl}</span>${name}`;
+      b.setAttribute('aria-label', `${name} — level ${lvl}, ${LV[lvl].name}`);
+      b.addEventListener('click', ()=>select(b,name,lvl,why,ev,dom.d));
+      b.addEventListener('mouseenter', ()=>{ if(window.innerWidth>1080) show(name,lvl,why,ev,dom.d); });
+      cells.appendChild(b);
+    });
+    sec.appendChild(cells);
+    matrix.appendChild(sec);
   });
-  legend.appendChild(b);
-});
+
+  document.getElementById('n-topics').textContent = `${total} topics`;
+
+  [4,3,2,1].forEach(l=>{
+    const seg = document.createElement('div');
+    seg.className = 'ribbon-seg';
+    seg.style.flexGrow = counts[l];
+    seg.style.background = `var(${LV[l].css})`;
+    seg.style.color = `var(${LV[l].css}-ink)`;
+    const pct = Math.round(counts[l]/total*100);
+    seg.innerHTML = `<b>${counts[l]}</b><span>${LV[l].name} · ${pct}%</span>`;
+    ribbon.appendChild(seg);
+  });
+  [...ribbon.children].forEach((seg,i)=>{
+    const l = [4,3,2,1][i];
+    seg.style.color = getComputedStyle(document.documentElement).getPropertyValue(`--L${l}-ink`);
+  });
+
+  [1,2,3,4].forEach(l=>{
+    const b = document.createElement('button');
+    b.setAttribute('aria-pressed','false');
+    b.innerHTML = `<span class="sw"><i class="chip" style="background:var(${LV[l].css})"></i>${l} · ${LV[l].name}</span><span class="desc">${LV[l].desc} — ${counts[l]} topics</span>`;
+    b.addEventListener('click', ()=>{
+      activeFilter = (activeFilter===l) ? null : l;
+      [...legend.children].forEach((x,i)=>x.setAttribute('aria-pressed', String(activeFilter===i+1)));
+      document.querySelectorAll('.cell').forEach(c=>{
+        c.classList.toggle('dim', activeFilter!==null && +c.dataset.lvl!==activeFilter);
+      });
+    });
+    legend.appendChild(b);
+  });
+}
+
+// Show toggle button if quiz data exists
+userQuizData = getQuizData();
+if (userQuizData) {
+  document.getElementById('btn-toggle').hidden = false;
+}
+
+renderHeatmap();
 
 /* detail rail */
 const rail = document.getElementById('rail');
