@@ -19,8 +19,9 @@ COPY index.html .
 COPY quiz.html .
 COPY assets/ assets/
 
-EXPOSE 8000
+EXPOSE 8080
 
 # Run from /app/backend/ so imports resolve correctly
 WORKDIR /app/backend
-CMD ["python3", "-X", "utf8", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Cloud Run injects $PORT (default 8080); fall back to 8080 for local `docker run`
+CMD python3 -X utf8 -m uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}
