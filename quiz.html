@@ -480,6 +480,43 @@
   }
   .method p{margin:0;font-size:13px;line-height:1.55;color:var(--ink-2)}
 
+  .session-bar{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+    padding:10px 0;
+    margin-bottom:16px;
+    border-bottom:1px solid var(--rule);
+  }
+  .session-bar .save-indicator{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-3);
+    flex:1;
+  }
+  .session-bar button{
+    padding:6px 14px;
+    font-size:10px;
+  }
+  .session-bar .btn-import{
+    background:transparent;
+    color:var(--ink);
+  }
+  .session-bar .btn-import:hover{background:var(--paper)}
+  .import-input{display:none}
+
+  .nav-link{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-3);
+    text-decoration:none;
+    transition:color .14s;
+  }
+  .nav-link:hover{color:var(--ink)}
+
   .hidden{display:none!important}
 
   @media (max-width:1080px){
@@ -501,33 +538,6 @@
     }
   }
   @media (min-width:1081px){ .rail-close{display:none} }
-  /* ---------- session toolbar ---------- */
-  .session-bar{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:20px;
-  }
-  .session-bar .save-indicator{
-    font-family:var(--mono);
-    font-size:10.5px;
-    letter-spacing:.1em;
-    text-transform:uppercase;
-    color:var(--L4);
-    display:flex;align-items:center;gap:5px;
-    margin-right:auto;
-  }
-  .session-bar .save-indicator.unsaved{color:var(--ink-3)}
-  .session-bar button{
-    font-size:11px;
-    padding:8px 16px;
-    background:transparent;
-    color:var(--ink);
-  }
-  .session-bar button:hover{background:var(--paper)}
-  .import-input{display:none}
-
   @media (max-width:560px){
     .legend{grid-template-columns:repeat(2,1fr)}
     .cells{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
@@ -544,9 +554,18 @@
       <span>Knowledge quiz</span>
       <span id="n-topics">143 topics</span>
       <span>LLM-evaluated</span>
+      <a href="index.html" class="nav-link">View heatmap</a>
     </div>
 
     <h1>What do you <em>actually</em> know?</h1>
+
+    <div class="session-bar">
+      <span class="save-indicator" id="save-indicator">No saved progress</span>
+      <button onclick="exportProfile()">Export profile</button>
+      <button class="btn-import" onclick="document.getElementById('import-input').click()">Import profile</button>
+      <input type="file" id="import-input" class="import-input" accept=".json" onchange="importProfile(event)">
+      <button class="btn-import" onclick="confirmReset()">Reset</button>
+    </div>
 
     <div class="progress-wrap">
       <div class="progress-label">
@@ -556,14 +575,6 @@
       <div class="progress-bar">
         <div class="progress-fill" id="progress-fill" style="width:0%"></div>
       </div>
-    </div>
-
-    <div class="session-bar" id="session-bar">
-      <span class="save-indicator unsaved" id="save-indicator">No saved progress</span>
-      <button class="secondary" onclick="exportProfile()">Export</button>
-      <button class="secondary" onclick="document.getElementById('import-input').click()">Import</button>
-      <input type="file" id="import-input" class="import-input" accept=".json" onchange="importProfile(event)">
-      <button class="secondary" onclick="confirmReset()">Reset</button>
     </div>
 
     <div class="quiz-card" id="quiz-card">
@@ -607,6 +618,7 @@
       <span id="reveal-date"></span>
       <span id="reveal-count"></span>
       <span>LLM-evaluated from your explanations</span>
+      <a href="index.html" class="nav-link">View original heatmap</a>
     </div>
 
     <div class="reveal-section">
@@ -651,7 +663,7 @@
     <div class="btn-row" style="margin-top:32px">
       <button onclick="exportProfile()">Export profile (.json)</button>
       <button class="secondary" onclick="downloadHeatmap()">Download heatmap (.html)</button>
-      <button class="secondary" onclick="confirmReset()">Take the quiz again</button>
+      <button class="secondary" onclick="confirmReset()">Reset quiz</button>
     </div>
   </div>
 
@@ -1195,57 +1207,48 @@ function resetQuiz() {
 }
 
 function confirmReset() {
-  const done = evaluatedTopics.length;
-  if (done === 0 || confirm(`This will erase progress on ${done} evaluated topic${done === 1 ? '' : 's'}. Continue?`)) {
+  if (evaluatedTopics.length === 0) { resetQuiz(); return; }
+  if (confirm(`This will clear all progress (${evaluatedTopics.length} evaluated topics). Continue?`)) {
     resetQuiz();
   }
 }
 
-// ─── Save indicator ───
-function updateSaveIndicator() {
-  const el = document.getElementById('save-indicator');
-  if (!el) return;
-  const done = evaluatedTopics.length;
-  if (done > 0) {
-    el.textContent = `Progress saved — ${done}/${allTopics.length} topics`;
-    el.classList.remove('unsaved');
-  } else {
-    el.textContent = 'No saved progress';
-    el.classList.add('unsaved');
-  }
-}
-
-// ─── Export ───
+// ─── Profile export/import ───
 function exportProfile() {
+  const profileName = prompt('Profile name (for the exported file):', 'My AI Knowledge Profile');
+  if (!profileName) return;
+
+  const domains = {};
+  DOMAINS.forEach(dom => {
+    const topics = {};
+    dom.t.forEach(([name]) => {
+      const entry = evaluatedTopics.find(t => t.name === name);
+      if (entry) {
+        topics[name] = { score: entry.score, reasoning: entry.reasoning, evidence: entry.evidence };
+      }
+    });
+    if (Object.keys(topics).length > 0) {
+      domains[dom.d] = topics;
+    }
+  });
+
   const profile = {
-    profileName: prompt('Name this profile (e.g. your name):', 'My AI Heatmap') || 'My AI Heatmap',
+    profileName,
     exportedAt: new Date().toISOString(),
     totalTopics: allTopics.length,
     evaluatedCount: evaluatedTopics.length,
-    domains: {},
+    domains,
   };
 
-  evaluatedTopics.forEach(t => {
-    if (!profile.domains[t.domain]) profile.domains[t.domain] = {};
-    profile.domains[t.domain][t.name] = {
-      score: t.score,
-      reasoning: t.reasoning,
-      evidence: t.evidence,
-    };
-  });
-
-  const json = JSON.stringify(profile, null, 2);
-  const blob = new Blob([json], {type: 'application/json'});
+  const blob = new Blob([JSON.stringify(profile, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  const safeName = profile.profileName.replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase();
-  a.download = `ai-heatmap-${safeName}.json`;
+  a.download = profileName.replace(/[^a-zA-Z0-9_-]/g, '_') + '.json';
   a.click();
   URL.revokeObjectURL(url);
 }
 
-// ─── Import ───
 function importProfile(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -1255,30 +1258,32 @@ function importProfile(event) {
     try {
       const profile = JSON.parse(e.target.result);
       if (!profile.domains || typeof profile.domains !== 'object') {
-        alert('Invalid profile file — missing "domains" field.');
+        alert('Invalid profile: missing "domains" object.');
         return;
       }
 
-      const count = Object.values(profile.domains).reduce((sum, d) => sum + Object.keys(d).length, 0);
-      const name = profile.profileName || 'Unknown';
-      if (!confirm(`Import "${name}" (${count} topics)? This will replace your current progress.`)) return;
+      if (!confirm(`Import "${profile.profileName || 'Unknown'}" (${profile.evaluatedCount || '?'} topics)? This will replace your current progress.`)) {
+        return;
+      }
 
       evaluatedTopics = [];
-      for (const [domain, topics] of Object.entries(profile.domains)) {
-        for (const [topicName, data] of Object.entries(topics)) {
+      Object.entries(profile.domains).forEach(([domainName, topics]) => {
+        Object.entries(topics).forEach(([topicName, data]) => {
           evaluatedTopics.push({
             name: topicName,
-            domain: domain,
+            domain: domainName,
             score: data.score,
-            reasoning: data.reasoning,
+            reasoning: data.reasoning || '',
             evidence: data.evidence || '',
           });
-        }
-      }
+        });
+      });
 
       const evalNames = new Set(evaluatedTopics.map(t => t.name));
       pendingTopics = allTopics.filter(t => !evalNames.has(t.name));
-      currentDomainIndex = 0;
+      currentDomainIndex = domainOrder.length;
+      retakeMode = false;
+      retakeDomainName = null;
 
       saveState();
       updateProgress();
@@ -1289,14 +1294,22 @@ function importProfile(event) {
       } else {
         showNextTopic();
       }
-
-      alert(`Imported "${name}" — ${evaluatedTopics.length} topics loaded, ${pendingTopics.length} remaining.`);
-    } catch(err) {
-      alert('Could not read file: ' + err.message);
+    } catch (err) {
+      alert('Could not read profile: ' + err.message);
     }
   };
   reader.readAsText(file);
   event.target.value = '';
+}
+
+function updateSaveIndicator() {
+  const el = document.getElementById('save-indicator');
+  if (!el) return;
+  if (evaluatedTopics.length > 0) {
+    el.textContent = `Progress saved — ${evaluatedTopics.length}/${allTopics.length} topics`;
+  } else {
+    el.textContent = 'No saved progress';
+  }
 }
 
 // ─── Keyboard shortcut ───

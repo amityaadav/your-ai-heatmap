@@ -73,8 +73,33 @@
     max-width:60ch;
     color:var(--ink-2);
     font-size:clamp(15px,1.5vw,17px);
-    margin:0 0 30px;
+    margin:0 0 16px;
   }
+  .nav-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+  }
+  .nav-row a{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    text-decoration:none;
+    padding:12px 24px;
+    border:1px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    transition:background .14s, color .14s;
+  }
+  .nav-row a:hover{background:var(--ink-2)}
+  .nav-row a.secondary{
+    background:transparent;
+    color:var(--ink);
+  }
+  .nav-row a.secondary:hover{background:var(--paper)}
 
   /* ---------- signature: spectrum ribbon ---------- */
   .ribbon-block{margin:0 0 12px}
@@ -322,6 +347,10 @@
     actually said, asked, built, debugged, or taught. Click any cell for the reasoning behind its score.
     Click a legend swatch to isolate one band.
   </p>
+
+  <div class="nav-row">
+    <a href="quiz.html">Take the quiz yourself</a>
+  </div>
 
   <div class="ribbon-block">
     <div class="ribbon-label">Overall distribution — width is proportional to topic count</div>
