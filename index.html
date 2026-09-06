@@ -535,7 +535,7 @@ function renderHeatmap() {
       b.innerHTML = `<span class="lvl">${lvl}</span>${name}`;
       b.setAttribute('aria-label', `${name} — level ${lvl}, ${LV[lvl].name}`);
       b.addEventListener('click', ()=>select(b,name,lvl,why,ev,dom.d));
-      b.addEventListener('mouseenter', ()=>{ if(window.innerWidth>1080) show(name,lvl,why,ev,dom.d); });
+
       cells.appendChild(b);
     });
     sec.appendChild(cells);
