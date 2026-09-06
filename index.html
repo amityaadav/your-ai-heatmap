@@ -599,6 +599,7 @@ function toggleView() {
     document.getElementById('view-date').textContent = formatCompiledDate();
   }
   renderHeatmap();
+  if (trendActive) renderTrend();
 }
 
 /* ---------- build ---------- */
@@ -779,9 +780,28 @@ function toggleTrend() {
   }
 }
 
+function profileSnapshot() {
+  if (!amitProfile) return null;
+  const counts = {1:0,2:0,3:0,4:0};
+  let total = 0;
+  Object.values(amitProfile.domains).forEach(topics => {
+    Object.values(topics).forEach(info => { counts[info.score]++; total++; });
+  });
+  return { date: amitProfile.exportedAt, L1: counts[1], L2: counts[2], L3: counts[3], L4: counts[4], total };
+}
+
 function renderTrend() {
   const trendView = document.getElementById('trend-view');
-  const history = getHistory();
+
+  let history;
+  let isProfileView = false;
+  if (showingUserScores) {
+    history = getHistory();
+  } else {
+    const snap = profileSnapshot();
+    history = snap ? [snap] : [];
+    isProfileView = true;
+  }
 
   if (history.length < 1) {
     trendView.innerHTML = `<div class="trend-empty"><p>No progression data yet</p><p>Take the quiz or retake topics to start tracking your score progression over time. Each quiz save creates a snapshot automatically.</p></div>`;
@@ -820,8 +840,11 @@ function renderTrend() {
   const spanDays = Math.round((lastDate - firstDate) / 86400000);
   const spanLabel = spanDays < 2 ? 'today' : spanDays < 60 ? `${spanDays} days` : `${Math.round(spanDays/30)} months`;
 
+  const footerLeft = isProfileView ? 'Profile score distribution' : (history.length > 1 ? 'Auto-saved after each quiz interaction' : 'Baseline snapshot — retake topics to see progression');
+  const footerRight = isProfileView ? `${last.total} topics` : `${history.length} snapshot${history.length !== 1 ? 's' : ''}`;
+
   trendView.innerHTML = statsHTML +
-    `<div class="trend-chart-wrap"><div class="trend-chart-head"><span class="trend-chart-title">Topic count by level${history.length > 1 ? ' — ' + spanLabel : ''}</span>${legendHTML}</div><canvas id="trend-canvas" class="trend-canvas" width="1600" height="560"></canvas><div class="trend-tooltip" id="trend-tooltip"></div>${history.length > 1 ? `<div class="trend-info"><span>Auto-saved after each quiz interaction</span><span>${history.length} snapshots</span></div>` : `<div class="trend-info"><span>Baseline snapshot — retake topics to see progression</span><span>1 snapshot</span></div>`}</div>`;
+    `<div class="trend-chart-wrap"><div class="trend-chart-head"><span class="trend-chart-title">Topic count by level${history.length > 1 ? ' — ' + spanLabel : ''}</span>${legendHTML}</div><canvas id="trend-canvas" class="trend-canvas" width="1600" height="560"></canvas><div class="trend-tooltip" id="trend-tooltip"></div><div class="trend-info"><span>${footerLeft}</span><span>${footerRight}</span></div></div>`;
 
   drawTrendChart(history, series);
 }
