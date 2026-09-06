@@ -481,6 +481,13 @@ function profileToDomains(profile) {
   }));
 }
 
+function formatCompiledDate() {
+  const profileDate = amitProfile ? new Date(amitProfile.exportedAt) : new Date('2026-08-03');
+  const quizDate = userQuizData && userQuizData.lastUpdated ? new Date(userQuizData.lastUpdated) : null;
+  const latest = (quizDate && quizDate > profileDate) ? quizDate : profileDate;
+  return 'Compiled ' + latest.toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+}
+
 function toggleView() {
   showingUserScores = !showingUserScores;
   const btn = document.getElementById('btn-toggle');
@@ -494,7 +501,7 @@ function toggleView() {
     btn.textContent = 'View your scores';
     btn.classList.remove('active');
     document.getElementById('view-name').textContent = amitProfile ? amitProfile.profileName : 'Amit Yadav';
-    document.getElementById('view-date').textContent = amitProfile ? 'Compiled ' + new Date(amitProfile.exportedAt).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : 'Compiled 03 Aug 2026';
+    document.getElementById('view-date').textContent = formatCompiledDate();
   }
   renderHeatmap();
 }
@@ -614,6 +621,7 @@ async function init() {
   userQuizData = getQuizData();
   if (userQuizData) {
     document.getElementById('btn-toggle').hidden = false;
+    document.getElementById('view-date').textContent = formatCompiledDate();
   }
   renderHeatmap();
 }

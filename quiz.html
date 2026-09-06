@@ -774,6 +774,7 @@ function saveState() {
     domainIndex: currentDomainIndex,
     retakeMode: retakeMode,
     retakeDomainName: retakeDomainName,
+    lastUpdated: new Date().toISOString(),
   }));
   updateSaveIndicator();
 }
