@@ -37,7 +37,7 @@
       "CNNs & convolution": {
         "score": 4,
         "reasoning": "Full transfer-learning lab: frozen VGG16 feature extractor, custom head, then unfreezing. You diagnosed catastrophic forgetting from the learning rate yourself.",
-        "evidence": "NVIDIA DLI certification · Conv2d parameter semantics · coached Swati through the same lab",
+        "evidence": "NVIDIA DLI certification · Conv2d parameter semantics · coached a colleague through the same lab",
         "resources": [
           {
             "title": "Stanford CS231n — CNNs for Visual Recognition",
@@ -262,7 +262,7 @@
       "Open weights & model licensing": {
         "score": 3,
         "reasoning": "You did real work here — leaderboard by SWE-bench, open models as a price-floor hedge. That's an informed position.",
-        "evidence": "Local inference economics study for TRP",
+        "evidence": "Local inference economics study for enterprise employer",
         "resources": [
           {
             "title": "Hugging Face — Open LLM Leaderboard",
@@ -944,8 +944,8 @@
       },
       "Prompt libraries & reuse": {
         "score": 3,
-        "reasoning": "Actively building a living library tied to real TRP artifacts. That's the right instinct and it's in flight.",
-        "evidence": "In progress at TRP",
+        "reasoning": "Actively building a living library tied to real enterprise artifacts. That's the right instinct and it's in flight.",
+        "evidence": "In progress at work",
         "resources": [
           {
             "title": "Anthropic — Prompt library",
@@ -1112,7 +1112,7 @@
       "Cost & latency benchmarking": {
         "score": 3,
         "reasoning": "Three-year TCO across hardware tiers, ending in a model-routing recommendation rather than a hardware buy. That's a defensible piece of analysis.",
-        "evidence": "TRP local inference study",
+        "evidence": "Enterprise local inference study",
         "resources": [
           {
             "title": "Artificial Analysis — LLM benchmarks",
@@ -1264,7 +1264,7 @@
       "AI regulation — financial services": {
         "score": 3,
         "reasoning": "FINRA's 2026 oversight report, SEC exam priorities, the 40%/44% adoption-vs-validation gap. You cite real numbers, which is rare.",
-        "evidence": "Applied to TRP context repeatedly",
+        "evidence": "Applied to enterprise context repeatedly",
         "resources": [
           {
             "title": "FINRA — AI in securities industry",
@@ -1293,7 +1293,7 @@
       },
       "EU AI Act & global policy": {
         "score": 1,
-        "reasoning": "Hasn't come up. Notable given TRP's global footprint.",
+        "reasoning": "Hasn't come up. Notable given the employer's global footprint.",
         "evidence": "",
         "resources": [
           {
@@ -1491,7 +1491,7 @@
       "Model routing architecture": {
         "score": 3,
         "reasoning": "Your own conclusion from the TCO work, and the right one — route across tiers rather than own hardware.",
-        "evidence": "TRP local inference study",
+        "evidence": "Enterprise local inference study",
         "resources": [
           {
             "title": "Martian — Model router",
@@ -1535,7 +1535,7 @@
       },
       "API gateway patterns": {
         "score": 3,
-        "reasoning": "You mapped AgentCore Gateway onto TRP's existing Apigee layer unprompted — that's the architect move.",
+        "reasoning": "You mapped AgentCore Gateway onto the existing enterprise Apigee layer unprompted — that's the architect move.",
         "evidence": "AgentCore training",
         "resources": [
           {
@@ -1870,7 +1870,7 @@
       "AI economics & compute markets": {
         "score": 3,
         "reasoning": "The TCO study plus the capex/power reading gives you a genuine position on where cost pressure comes from.",
-        "evidence": "TRP study · trends",
+        "evidence": "Enterprise study · trends",
         "resources": [
           {
             "title": "Epoch AI — Trends in ML",
@@ -1932,7 +1932,7 @@
       "AI adoption strategy": {
         "score": 4,
         "reasoning": "Tools-first sequencing for BAs — Jira/Confluence agents, then Copilot, then the proprietary LLM interface — with measurement of behaviour change rather than licence counts. That's a real strategy.",
-        "evidence": "30-BA programme at TRP",
+        "evidence": "30-BA programme at enterprise employer",
         "resources": [
           {
             "title": "McKinsey — State of AI",
@@ -1977,7 +1977,7 @@
       "Requirements to architecture translation": {
         "score": 4,
         "reasoning": "This is the BA-to-architect bridge you're actively walking, with steering files and test plans as the mechanism.",
-        "evidence": "POC practice at TRP",
+        "evidence": "POC practice at enterprise employer",
         "resources": [
           {
             "title": "Martin Fowler — Architecture guides",
@@ -2037,7 +2037,7 @@
       "Stakeholder communication & buy-in": {
         "score": 3,
         "reasoning": "You prepare for rooms — the AMA questions were built to be non-dodgeable, and you thought about political dynamics before content.",
-        "evidence": "AMA prep · Nagendra 1:1",
+        "evidence": "AMA prep · leadership 1:1",
         "resources": [
           {
             "title": "Harvard Business Review — Leading with AI",
