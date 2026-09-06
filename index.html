@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Knowledge Survey — Amit Yadav</title>
+<title>AI Knowledge Heatmap — Amit Yadav</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -304,6 +304,28 @@
     color:var(--ink-3);border-top:1px solid var(--rule);padding-top:11px;margin:0;
   }
   .rail .ev b{color:var(--ink-2);font-weight:600}
+  .rail .learn{
+    border-top:1px solid var(--rule);padding-top:11px;margin:14px 0 0;
+  }
+  .rail .learn-heading{
+    font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--ink-3);margin:0 0 8px;font-weight:500;
+  }
+  .rail .learn a{
+    display:block;
+    font-size:13px;line-height:1.35;
+    color:var(--ink);
+    text-decoration:none;
+    padding:6px 0;
+    border-bottom:1px solid var(--rule);
+    transition:color .12s;
+  }
+  .rail .learn a:last-child{border-bottom:0}
+  .rail .learn a:hover{color:var(--L4)}
+  .rail .learn a .src{
+    font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+    color:var(--ink-3);display:block;margin-top:2px;
+  }
   .retake-link{
     display:inline-block;
     font-family:var(--mono);
@@ -365,11 +387,9 @@
 <div class="shell">
 
   <div class="eyebrow">
-    <span>Knowledge survey</span>
     <span id="view-name">Amit Yadav</span>
     <span id="view-date">Compiled 03 Aug 2026</span>
     <span id="n-topics">— topics</span>
-    <span>Topics curated from AI/ML curricula, certifications & industry research (2025–2026)</span>
   </div>
 
   <h1>What you know about AI, and <em>where the map goes dark</em>.</h1>
@@ -401,6 +421,9 @@
       <div class="band" id="r-band" hidden><i></i><span></span></div>
       <p class="why" id="r-why">Every square carries the specific reason it landed where it did — what you built, what you only asked about, and what has never come up at all.</p>
       <p class="ev" id="r-ev"></p>
+      <div class="learn" id="r-learn" hidden>
+        <p class="learn-heading">Learn more</p>
+      </div>
       <a id="r-retake" href="#" class="retake-link" hidden>Retake this topic</a>
     </aside>
   </div>
@@ -408,11 +431,11 @@
   <div class="method">
     <div>
       <h4>How this was scored</h4>
-      <p>Evidence-based, not self-reported. 143 topics across 12 domains curated from NVIDIA DLI coursework, AWS AI Practitioner certification, OWASP/NIST/ISO frameworks, and current AI/ML research literature. A topic only reaches dark green with a shipped artifact, a debugging session that went past the surface, or a session where you taught it to someone else. Light green means you've reasoned about it correctly. Light red means surface-level exposure only. Red means no demonstrated knowledge.</p>
+      <p>Evidence-based, not self-reported. <span id="method-count"></span> topics across 12 domains curated from NVIDIA DLI coursework, AWS AI Practitioner certification, OWASP/NIST/ISO frameworks, and current AI/ML research literature. A topic only reaches dark green with a shipped artifact, a debugging session that went past the surface, or a session where you taught it to someone else. Light green means you've reasoned about it correctly. Light red means surface-level exposure only. Red means no demonstrated knowledge.</p>
     </div>
     <div>
       <h4>The known bias</h4>
-      <p>This maps what you demonstrated during the assessment. Work you did silently — at TRP, in personal projects, or in research you didn't reference — is invisible here and will be scored too low. Treat red cells in your own domain as prompts to provide evidence, not as verdicts.</p>
+      <p>This maps what was demonstrated during the assessment. Work done outside the assessment — in day jobs, personal projects, or research not referenced — is invisible here and will be scored too low. Treat red cells as prompts to provide evidence, not as verdicts.</p>
     </div>
     <div>
       <h4>Reading breadth vs depth</h4>
@@ -454,7 +477,7 @@ function profileToDomains(profile) {
   return Object.entries(profile.domains).map(([domName, topics]) => ({
     d: domName,
     note: (profile.domainNotes && profile.domainNotes[domName]) || '',
-    t: Object.entries(topics).map(([name, info]) => [name, info.score, info.reasoning, info.evidence || ''])
+    t: Object.entries(topics).map(([name, info]) => [name, info.score, info.reasoning, info.evidence || '', info.resources || []])
   }));
 }
 
@@ -523,18 +546,19 @@ function renderHeatmap() {
 
     const cells = document.createElement('div');
     cells.className = 'cells';
-    dom.t.forEach(([name,origLvl,origWhy,origEv])=>{
+    dom.t.forEach(([name,origLvl,origWhy,origEv,origRes])=>{
       const entry = lookup ? lookup[name] : null;
       const lvl = lookup ? (entry ? entry.score : 1) : origLvl;
       const why = lookup ? (entry ? entry.reasoning : 'Not yet evaluated — take the quiz to score this topic.') : origWhy;
       const ev = lookup ? (entry ? (entry.evidence || '') : '') : origEv;
+      const res = origRes || [];
 
       const b = document.createElement('button');
       b.className = 'cell';
       b.dataset.lvl = lvl;
       b.innerHTML = `<span class="lvl">${lvl}</span>${name}`;
       b.setAttribute('aria-label', `${name} — level ${lvl}, ${LV[lvl].name}`);
-      b.addEventListener('click', ()=>select(b,name,lvl,why,ev,dom.d));
+      b.addEventListener('click', ()=>select(b,name,lvl,why,ev,dom.d,res));
 
       cells.appendChild(b);
     });
@@ -543,6 +567,8 @@ function renderHeatmap() {
   });
 
   document.getElementById('n-topics').textContent = `${total} topics`;
+  const mc = document.getElementById('method-count');
+  if (mc) mc.textContent = total;
 
   [4,3,2,1].forEach(l=>{
     const seg = document.createElement('div');
@@ -601,24 +627,55 @@ const rWhy   = document.getElementById('r-why');
 const rEv    = document.getElementById('r-ev');
 
 const rRetake = document.getElementById('r-retake');
-function show(name,lvl,why,ev,dom){
+const rLearn = document.getElementById('r-learn');
+function show(name,lvl,why,ev,dom,res){
   rTitle.textContent = name;
   rBand.hidden = false;
   rBand.querySelector('i').style.background = `var(${LV[lvl].css})`;
   rBand.querySelector('span').textContent = `${lvl} · ${LV[lvl].name}`;
   rWhy.textContent = why;
   rEv.innerHTML = ev ? `<b>Evidence</b> — ${ev}<br><b>Domain</b> — ${dom}` : `<b>Evidence</b> — none in the record.<br><b>Domain</b> — ${dom}`;
+  if (res && res.length) {
+    rLearn.hidden = false;
+    const heading = rLearn.querySelector('.learn-heading');
+    rLearn.innerHTML = '';
+    rLearn.appendChild(heading);
+    res.forEach(r => {
+      const a = document.createElement('a');
+      a.href = r.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      const host = new URL(r.url).hostname.replace(/^www\./,'');
+      a.innerHTML = r.title + `<span class="src">${host} ↗</span>`;
+      rLearn.appendChild(a);
+    });
+  } else {
+    rLearn.hidden = true;
+  }
   rRetake.href = `quiz.html?retake=${encodeURIComponent(name)}`;
   rRetake.hidden = false;
 }
-function select(btn,name,lvl,why,ev,dom){
+function select(btn,name,lvl,why,ev,dom,res){
   document.querySelectorAll('.cell.sel').forEach(c=>c.classList.remove('sel'));
   btn.classList.add('sel');
-  show(name,lvl,why,ev,dom);
+  show(name,lvl,why,ev,dom,res);
   if(window.innerWidth<=1080) rail.classList.add('open');
 }
-document.getElementById('railClose').addEventListener('click',()=>rail.classList.remove('open'));
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') rail.classList.remove('open'); });
+function deselect(){
+  document.querySelectorAll('.cell.sel').forEach(c=>c.classList.remove('sel'));
+  rTitle.textContent = 'Pick a cell';
+  rBand.hidden = true;
+  rWhy.textContent = 'Every square carries the specific reason it landed where it did — what you built, what you only asked about, and what has never come up at all.';
+  rEv.innerHTML = '';
+  rRetake.hidden = true;
+  rLearn.hidden = true;
+  rail.classList.remove('open');
+}
+document.getElementById('railClose').addEventListener('click', deselect);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') deselect(); });
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.cell') && !e.target.closest('.rail')) deselect();
+});
 </script>
 </body>
 </html>
