@@ -4,7 +4,7 @@
 Transform the static AI Knowledge Heatmap into a dynamic system that assesses a user's AI/ML knowledge through a quiz and generates a personalized heatmap based on the results.
 
 ## Functional Requirements
-1. **Topic Catalog**: The system must use the same 143 topics across 12 domains defined in the original heatmap. ✅
+1. **Topic Catalog**: The system must use the same 148 topics across 12 domains defined in the original heatmap. ✅
 2. **Quiz Engine**:
    - Present topics one by one in domain order. ✅
    - Open-ended explanation fields where users describe their knowledge. ✅
@@ -30,4 +30,4 @@ Transform the static AI Knowledge Heatmap into a dynamic system that assesses a 
 ## Architecture
 - **Backend**: `backend/main.py` (FastAPI), `backend/sensing_engine.py` (LLM evaluator), `backend/models.py` (Pydantic schemas)
 - **Frontend**: `quiz.html` (single-file SPA, no build step)
-- **Data**: `assets/js/data.js` (143 topics extracted from `index.html`)
+- **Data**: `assets/js/data.js` (148 topics), `assets/data/amit-profile.json` (canonical scored profile with learning resources)
