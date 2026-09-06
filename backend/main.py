@@ -142,6 +142,7 @@ async def serve_quiz():
 
 
 @app.get("/")
+@app.get("/index.html")
 async def serve_index():
     """Serve the original heatmap as the index."""
     path = STATIC_DIR / "index.html"
