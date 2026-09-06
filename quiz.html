@@ -767,6 +767,20 @@ function resetState() {
   saveState();
 }
 
+function saveSnapshot() {
+  if (evaluatedTopics.length === 0 || allTopics.length === 0) return;
+  const counts = {1:0, 2:0, 3:0, 4:0};
+  evaluatedTopics.forEach(t => { counts[t.score] = (counts[t.score] || 0) + 1; });
+  counts[1] += allTopics.length - evaluatedTopics.length;
+  try {
+    const history = JSON.parse(localStorage.getItem('ai-heatmap-history') || '[]');
+    const last = history[history.length - 1];
+    if (last && last.L1 === counts[1] && last.L2 === counts[2] && last.L3 === counts[3] && last.L4 === counts[4]) return;
+    history.push({ date: new Date().toISOString(), L1: counts[1], L2: counts[2], L3: counts[3], L4: counts[4], total: allTopics.length });
+    localStorage.setItem('ai-heatmap-history', JSON.stringify(history));
+  } catch(e) {}
+}
+
 function saveState() {
   localStorage.setItem('ai-heatmap-quiz', JSON.stringify({
     evaluated: evaluatedTopics,
@@ -774,7 +788,9 @@ function saveState() {
     domainIndex: currentDomainIndex,
     retakeMode: retakeMode,
     retakeDomainName: retakeDomainName,
+    lastUpdated: new Date().toISOString(),
   }));
+  saveSnapshot();
   updateSaveIndicator();
 }
 

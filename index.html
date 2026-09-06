@@ -342,6 +342,97 @@
   }
   .retake-link:hover{background:var(--ink-2)}
 
+  /* ---------- trend view ---------- */
+  .trend-view{display:none}
+  .trend-view.active{display:block}
+  .trend-stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--ink);
+    border:1px solid var(--ink);
+    margin-bottom:28px;
+  }
+  .trend-stat{
+    background:var(--paper-2);
+    padding:14px 16px;
+  }
+  .trend-stat-label{
+    font-family:var(--mono);
+    font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--ink-3);
+    display:flex;align-items:center;gap:6px;
+    margin-bottom:6px;
+  }
+  .trend-stat-label i{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+  .trend-stat-row{display:flex;align-items:baseline;gap:8px}
+  .trend-stat-value{
+    font-family:var(--display);font-weight:700;font-size:26px;
+    line-height:1;letter-spacing:-.02em;
+  }
+  .trend-stat-delta{
+    font-family:var(--mono);font-size:11px;
+    font-variant-numeric:tabular-nums;
+  }
+  .trend-stat-delta.up{color:var(--L4)}
+  .trend-stat-delta.down{color:var(--L1)}
+  .trend-chart-wrap{
+    border:1px solid var(--ink);
+    background:var(--paper-2);
+    padding:20px 20px 14px;
+    position:relative;
+  }
+  .trend-chart-head{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px;flex-wrap:wrap;gap:10px;
+  }
+  .trend-chart-title{
+    font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--ink-3);
+  }
+  .trend-legend{display:flex;gap:14px;flex-wrap:wrap}
+  .trend-legend-item{
+    display:flex;align-items:center;gap:5px;
+    font-family:var(--mono);font-size:10.5px;color:var(--ink-2);
+  }
+  .trend-legend-swatch{width:14px;height:3px;border-radius:1px}
+  .trend-canvas{display:block;width:100%;height:auto}
+  .trend-tooltip{
+    position:absolute;pointer-events:none;
+    background:var(--ink);color:var(--paper);
+    font-family:var(--mono);font-size:11px;
+    padding:10px 12px;border-radius:2px;
+    line-height:1.6;white-space:nowrap;
+    z-index:10;opacity:0;transition:opacity .12s;
+  }
+  .trend-tooltip.visible{opacity:1}
+  .trend-tooltip-date{
+    font-weight:600;margin-bottom:4px;
+    border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:4px;
+  }
+  .trend-tooltip-row{display:flex;align-items:center;gap:6px}
+  .trend-tooltip-key{width:10px;height:2px;border-radius:1px;flex:0 0 auto}
+  .trend-tooltip-val{margin-left:auto;padding-left:12px;font-weight:500}
+  .trend-info{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:12px;padding-top:10px;border-top:1px solid var(--rule);
+  }
+  .trend-info span{
+    font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.06em;
+  }
+  .trend-empty{
+    text-align:center;padding:60px 20px;
+    border:1px dashed var(--rule);margin-bottom:28px;
+  }
+  .trend-empty p{
+    font-size:14px;color:var(--ink-2);margin:0 0 6px;line-height:1.5;
+  }
+  .trend-empty p:first-child{font-weight:500;color:var(--ink);margin-bottom:10px}
+  @media(max-width:600px){
+    .trend-stats{grid-template-columns:repeat(2,1fr)}
+    .trend-chart-head{flex-direction:column;align-items:flex-start}
+  }
+
   /* ---------- closing ---------- */
   .method{
     border-top:1px solid var(--ink);
@@ -378,6 +469,7 @@
     .legend{grid-template-columns:repeat(2,1fr)}
     .cells{grid-template-columns:repeat(auto-fill,minmax(132px,1fr))}
   }
+  [hidden]{display:none!important}
   @media (prefers-reduced-motion:reduce){
     *{transition:none!important;animation:none!important}
   }
@@ -402,6 +494,7 @@
   <div class="nav-row">
     <a href="quiz.html">Take the quiz</a>
     <button id="btn-toggle" class="view-toggle" onclick="toggleView()" hidden>View your scores</button>
+    <button id="btn-trend" class="view-toggle" onclick="toggleTrend()">Trend</button>
   </div>
 
   <div class="ribbon-block">
@@ -427,6 +520,8 @@
       <a id="r-retake" href="#" class="retake-link" hidden>Retake this topic</a>
     </aside>
   </div>
+
+  <div id="trend-view" class="trend-view"></div>
 
   <div class="method">
     <div>
@@ -481,6 +576,13 @@ function profileToDomains(profile) {
   }));
 }
 
+function formatCompiledDate() {
+  const profileDate = amitProfile ? new Date(amitProfile.exportedAt) : new Date('2026-08-03');
+  const quizDate = userQuizData && userQuizData.lastUpdated ? new Date(userQuizData.lastUpdated) : null;
+  const latest = (quizDate && quizDate > profileDate) ? quizDate : profileDate;
+  return 'Compiled ' + latest.toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+}
+
 function toggleView() {
   showingUserScores = !showingUserScores;
   const btn = document.getElementById('btn-toggle');
@@ -494,7 +596,7 @@ function toggleView() {
     btn.textContent = 'View your scores';
     btn.classList.remove('active');
     document.getElementById('view-name').textContent = amitProfile ? amitProfile.profileName : 'Amit Yadav';
-    document.getElementById('view-date').textContent = amitProfile ? 'Compiled ' + new Date(amitProfile.exportedAt).toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'}) : 'Compiled 03 Aug 2026';
+    document.getElementById('view-date').textContent = formatCompiledDate();
   }
   renderHeatmap();
 }
@@ -614,10 +716,280 @@ async function init() {
   userQuizData = getQuizData();
   if (userQuizData) {
     document.getElementById('btn-toggle').hidden = false;
+    document.getElementById('view-date').textContent = formatCompiledDate();
   }
+  seedHistory();
   renderHeatmap();
 }
 init();
+
+/* ---------- trend view ---------- */
+let trendActive = false;
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('ai-heatmap-history') || '[]'); }
+  catch(e) { return []; }
+}
+
+function seedHistory() {
+  if (getHistory().length > 0) return;
+  if (!userQuizData || !userQuizData.evaluated || userQuizData.evaluated.length === 0) {
+    if (!amitProfile) return;
+    const counts = {1:0,2:0,3:0,4:0};
+    let total = 0;
+    Object.values(amitProfile.domains).forEach(topics => {
+      Object.values(topics).forEach(info => { counts[info.score]++; total++; });
+    });
+    const history = [{ date: amitProfile.exportedAt, L1: counts[1], L2: counts[2], L3: counts[3], L4: counts[4], total }];
+    try { localStorage.setItem('ai-heatmap-history', JSON.stringify(history)); } catch(e) {}
+    return;
+  }
+  const counts = {1:0,2:0,3:0,4:0};
+  const total = DOMAINS.reduce((s,d) => s + d.t.length, 0);
+  let evaluated = 0;
+  userQuizData.evaluated.forEach(t => { counts[t.score] = (counts[t.score]||0)+1; evaluated++; });
+  counts[1] += total - evaluated;
+  const date = userQuizData.lastUpdated || new Date().toISOString();
+  try {
+    localStorage.setItem('ai-heatmap-history', JSON.stringify([{ date, L1: counts[1], L2: counts[2], L3: counts[3], L4: counts[4], total }]));
+  } catch(e) {}
+}
+
+function toggleTrend() {
+  trendActive = !trendActive;
+  const btn = document.getElementById('btn-trend');
+  const trendView = document.getElementById('trend-view');
+  const ribbonBlock = document.querySelector('.ribbon-block');
+  const legendEl = document.getElementById('legend');
+  const gridWrap = document.querySelector('.grid-wrap');
+
+  if (trendActive) {
+    btn.classList.add('active');
+    ribbonBlock.hidden = true;
+    legendEl.hidden = true;
+    gridWrap.hidden = true;
+    trendView.classList.add('active');
+    renderTrend();
+  } else {
+    btn.classList.remove('active');
+    ribbonBlock.hidden = false;
+    legendEl.hidden = false;
+    gridWrap.hidden = false;
+    trendView.classList.remove('active');
+  }
+}
+
+function renderTrend() {
+  const trendView = document.getElementById('trend-view');
+  const history = getHistory();
+
+  if (history.length < 1) {
+    trendView.innerHTML = `<div class="trend-empty"><p>No progression data yet</p><p>Take the quiz or retake topics to start tracking your score progression over time. Each quiz save creates a snapshot automatically.</p></div>`;
+    return;
+  }
+
+  const first = history[0];
+  const last = history[history.length - 1];
+  const series = [
+    { key:'L4', label:'Can teach', css:'--L4' },
+    { key:'L3', label:'Can explain', css:'--L3' },
+    { key:'L2', label:'Heard of', css:'--L2' },
+    { key:'L1', label:'Not touched', css:'--L1' },
+  ];
+
+  let statsHTML = '<div class="trend-stats">';
+  series.forEach(s => {
+    const curr = last[s.key];
+    const delta = curr - first[s.key];
+    const sign = delta > 0 ? '+' : '';
+    const cls = delta > 0 ? 'up' : delta < 0 ? 'down' : '';
+    const arrow = delta > 0 ? ' ▲' : delta < 0 ? ' ▼' : '';
+    statsHTML += `<div class="trend-stat"><div class="trend-stat-label"><i style="background:var(${s.css})"></i>${s.label}</div><div class="trend-stat-row"><span class="trend-stat-value">${curr}</span>${history.length > 1 && delta !== 0 ? `<span class="trend-stat-delta ${cls}">${sign}${delta}${arrow}</span>` : ''}</div></div>`;
+  });
+  statsHTML += '</div>';
+
+  let legendHTML = '<div class="trend-legend">';
+  series.forEach(s => {
+    legendHTML += `<span class="trend-legend-item"><span class="trend-legend-swatch" style="background:var(${s.css})"></span>${s.key} ${s.label}</span>`;
+  });
+  legendHTML += '</div>';
+
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const firstDate = new Date(first.date);
+  const lastDate = new Date(last.date);
+  const spanDays = Math.round((lastDate - firstDate) / 86400000);
+  const spanLabel = spanDays < 2 ? 'today' : spanDays < 60 ? `${spanDays} days` : `${Math.round(spanDays/30)} months`;
+
+  trendView.innerHTML = statsHTML +
+    `<div class="trend-chart-wrap"><div class="trend-chart-head"><span class="trend-chart-title">Topic count by level${history.length > 1 ? ' — ' + spanLabel : ''}</span>${legendHTML}</div><canvas id="trend-canvas" class="trend-canvas" width="1600" height="560"></canvas><div class="trend-tooltip" id="trend-tooltip"></div>${history.length > 1 ? `<div class="trend-info"><span>Auto-saved after each quiz interaction</span><span>${history.length} snapshots</span></div>` : `<div class="trend-info"><span>Baseline snapshot — retake topics to see progression</span><span>1 snapshot</span></div>`}</div>`;
+
+  drawTrendChart(history, series);
+}
+
+function drawTrendChart(history, series) {
+  const canvas = document.getElementById('trend-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const containerW = canvas.parentElement.clientWidth - 40;
+  const W = Math.max(400, containerW);
+  const H = Math.round(W * 0.35);
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width = '100%';
+  canvas.style.height = 'auto';
+  ctx.scale(dpr, dpr);
+
+  const style = getComputedStyle(document.documentElement);
+  const colors = {};
+  series.forEach(s => { colors[s.key] = style.getPropertyValue(s.css).trim(); });
+  const inkColor = style.getPropertyValue('--ink-3').trim();
+  const ruleColor = style.getPropertyValue('--rule').trim();
+  const bgColor = style.getPropertyValue('--paper-2').trim();
+
+  const pad = { top: 14, right: 50, bottom: 36, left: 40 };
+  const plotW = W - pad.left - pad.right;
+  const plotH = H - pad.top - pad.bottom;
+
+  let maxVal = 0;
+  history.forEach(h => { series.forEach(s => { if (h[s.key] > maxVal) maxVal = h[s.key]; }); });
+  maxVal = Math.ceil(maxVal / 10) * 10;
+  if (maxVal < 10) maxVal = 10;
+
+  const dates = history.map(h => new Date(h.date));
+  const minT = dates[0].getTime();
+  const maxT = dates.length > 1 ? dates[dates.length - 1].getTime() : minT + 86400000;
+  const rangeT = maxT - minT || 1;
+
+  function xPos(d) { return pad.left + ((d.getTime() - minT) / rangeT) * plotW; }
+  function yPos(v) { return pad.top + plotH - (v / maxVal) * plotH; }
+
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  const yStep = maxVal <= 20 ? 5 : maxVal <= 50 ? 10 : 20;
+  ctx.strokeStyle = ruleColor;
+  ctx.lineWidth = 1;
+  ctx.font = '500 10px "IBM Plex Mono", monospace';
+  ctx.fillStyle = inkColor;
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (let v = 0; v <= maxVal; v += yStep) {
+    const y = Math.round(yPos(v)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    ctx.fillText(v.toString(), pad.left - 8, yPos(v));
+  }
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  if (history.length === 1) {
+    const d = dates[0];
+    ctx.fillText(d.getDate() + ' ' + monthNames[d.getMonth()] + ' ' + d.getFullYear(), xPos(d), H - pad.bottom + 8);
+  } else {
+    const labelCount = Math.min(dates.length, Math.floor(plotW / 70));
+    const step = Math.max(1, Math.floor((dates.length - 1) / (labelCount - 1)));
+    const labelIndices = new Set();
+    for (let i = 0; i < dates.length; i += step) labelIndices.add(i);
+    labelIndices.add(dates.length - 1);
+    labelIndices.forEach(i => {
+      const d = dates[i];
+      const label = monthNames[d.getMonth()] + ' ' + d.getFullYear().toString().slice(2);
+      ctx.fillText(label, xPos(d), H - pad.bottom + 8);
+    });
+  }
+
+  const seriesOrder = [...series].reverse();
+  seriesOrder.forEach(s => {
+    const pts = history.map((h, i) => ({ x: xPos(dates[i]), y: yPos(h[s.key]) }));
+
+    if (pts.length > 1) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) {
+        const cpx = (pts[i-1].x + pts[i].x) / 2;
+        ctx.bezierCurveTo(cpx, pts[i-1].y, cpx, pts[i].y, pts[i].x, pts[i].y);
+      }
+      ctx.lineTo(pts[pts.length-1].x, yPos(0));
+      ctx.lineTo(pts[0].x, yPos(0));
+      ctx.closePath();
+      ctx.fillStyle = colors[s.key] + '14';
+      ctx.fill();
+      ctx.restore();
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      const cpx = (pts[i-1].x + pts[i].x) / 2;
+      ctx.bezierCurveTo(cpx, pts[i-1].y, cpx, pts[i].y, pts[i].x, pts[i].y);
+    }
+    ctx.strokeStyle = colors[s.key];
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    pts.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = bgColor;
+      ctx.fill();
+      ctx.strokeStyle = colors[s.key];
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+
+    const lastPt = pts[pts.length - 1];
+    const lastVal = history[history.length - 1][s.key];
+    ctx.fillStyle = inkColor;
+    ctx.font = '600 10px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(lastVal.toString(), lastPt.x + 10, lastPt.y);
+  });
+
+  if (history.length < 2) return;
+  const tooltip = document.getElementById('trend-tooltip');
+  const wrap = canvas.closest('.trend-chart-wrap');
+
+  canvas.addEventListener('pointermove', function(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = W / rect.width;
+    const mx = (e.clientX - rect.left) * scaleX;
+    if (mx < pad.left || mx > W - pad.right) { tooltip.classList.remove('visible'); return; }
+
+    let closest = 0, closestDist = Infinity;
+    dates.forEach((d, i) => {
+      const dist = Math.abs(xPos(d) - mx);
+      if (dist < closestDist) { closestDist = dist; closest = i; }
+    });
+
+    const snap = history[closest];
+    const d = dates[closest];
+    const dateStr = d.getDate() + ' ' + monthNames[d.getMonth()] + ' ' + d.getFullYear();
+
+    let rows = `<div class="trend-tooltip-date">${dateStr}</div>`;
+    series.forEach(s => {
+      rows += `<div class="trend-tooltip-row"><span class="trend-tooltip-key" style="background:${colors[s.key]}"></span><span>${s.label}</span><span class="trend-tooltip-val">${snap[s.key]}</span></div>`;
+    });
+    tooltip.innerHTML = rows;
+    tooltip.classList.add('visible');
+
+    const tipRect = tooltip.getBoundingClientRect();
+    const wrapRect = wrap.getBoundingClientRect();
+    const px = (e.clientX - wrapRect.left);
+    const py = (e.clientY - wrapRect.top);
+    const flipX = px + tipRect.width + 16 > wrapRect.width;
+    tooltip.style.left = (flipX ? px - tipRect.width - 12 : px + 12) + 'px';
+    tooltip.style.top = Math.max(0, py - tipRect.height / 2) + 'px';
+  });
+
+  canvas.addEventListener('pointerleave', function() {
+    tooltip.classList.remove('visible');
+  });
+}
 
 /* detail rail */
 const rail = document.getElementById('rail');
