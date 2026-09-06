@@ -3,7 +3,7 @@
 ## Unit Tests (Logic)
 - **Scoring Validation**: Verify that a "Level 4" input correctly maps to the `--L4` CSS variable in the final output.
 - **Progress Tracking**: Ensure the progress bar updates correctly as topics are completed.
-- **Data Integrity**: Verify the 143 topics are all present and correctly grouped by domain.
+- **Data Integrity**: Verify the 148 topics are all present and correctly grouped by domain.
 - **State Persistence**: Test that refreshing the page restores the quiz state from LocalStorage.
 
 ## Integration Tests

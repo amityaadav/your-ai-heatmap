@@ -1,25 +1,20 @@
 # AI Knowledge Heatmap
 
-A self-contained, interactive knowledge survey mapping 143 AI/ML topics across
-12 domains, scored on a 4-level scale (untouched → heard of → can explain →
-built/taught) with evidence behind every cell.
+An interactive knowledge survey mapping 148 AI/ML topics across 12 domains,
+scored on a 4-level scale (untouched → heard of → can explain → built/taught)
+with evidence behind every cell and free learning resources for every topic.
 
-Single-file app — no build step, no dependencies. `index.html` is the whole
-site.
+Two parts: a **static dashboard** (`index.html`) that loads scores from a
+canonical JSON profile, and an **interactive quiz** (`quiz.html`) backed by a
+FastAPI + LLM evaluation engine.
 
 ## How it deploys
 
-There are two deploy targets, each covering a different part of the app:
-
-- **GitHub Pages** (`.github/workflows/pages.yml`) — publishes `index.html`,
-  `quiz.html`, and `assets/` as static files on every push to `main`. This
-  serves the heatmap, but the quiz's `/evaluate` endpoint needs the backend
-  below — the quiz won't score answers when only Pages is deployed.
-- **Google Cloud Run** (`.github/workflows/deploy-cloudrun.yml`) — builds the
-  `Dockerfile` (FastAPI backend + static files) and deploys it as a
-  container service on every push to `main`. This is the full app, quiz
-  backend included. Cloud Run scales to zero when idle, so it stays within
-  the free tier for low-traffic personal use.
+**Google Cloud Run** (`.github/workflows/deploy-cloudrun.yml`) — builds the
+`Dockerfile` (FastAPI backend + static files) and deploys it as a container
+service on every push to `main`. This is the full app: dashboard, quiz, and
+scoring backend. Cloud Run scales to zero when idle, so it stays within the
+free tier for low-traffic personal use.
 
 One-time setup for the Cloud Run workflow (requires a Google Cloud account):
 
@@ -45,6 +40,13 @@ One-time setup for the Cloud Run workflow (requires a Google Cloud account):
 
 ## Updating the content
 
-All the data lives in the `DOMAINS` array near the top of the `<script>` block
-in `index.html` — each topic is `[name, level, reasoning, evidence]`. Edit,
-commit, push; the site rebuilds automatically.
+- **Scores & reasoning**: Edit `assets/data/amit-profile.json` directly on
+  GitHub — update a score, push, and the dashboard reflects it on next page
+  load. Format: `{profileName, exportedAt, totalTopics, evaluatedCount,
+  domainNotes, domains}` with each topic carrying `{score, reasoning,
+  evidence, resources}`.
+- **Topic list**: Edit `assets/js/data.js` — the `DOMAINS` array used by the
+  quiz. Each topic is `[name, level, reasoning, evidence, resources]`.
+- **Learning resources**: Each topic carries a `resources` array of
+  `{title, url}` objects. These appear in the dashboard's detail rail as
+  "Learn more" links when a cell is selected.

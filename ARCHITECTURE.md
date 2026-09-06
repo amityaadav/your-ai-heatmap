@@ -96,7 +96,7 @@ your-ai-heatmap/
 │   ├── data/
 │   │   └── amit-profile.json  # Amit's scores (canonical, editable on GitHub)
 │   └── js/
-│       └── data.js            # 143 topics shared between index.html and quiz.html
+│       └── data.js            # 148 topics shared between index.html and quiz.html
 ├── backend/
 │   ├── main.py             # FastAPI app (serves API + static files)
 │   ├── sensing_engine.py   # LLM evaluator (Ollama Cloud / OpenRouter / local)
