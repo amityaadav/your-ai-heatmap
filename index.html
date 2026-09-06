@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Knowledge Survey — Amit Yadav</title>
+<title>AI Knowledge Heatmap — Amit Yadav</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -365,11 +365,9 @@
 <div class="shell">
 
   <div class="eyebrow">
-    <span>Knowledge survey</span>
     <span id="view-name">Amit Yadav</span>
     <span id="view-date">Compiled 03 Aug 2026</span>
     <span id="n-topics">— topics</span>
-    <span>Topics curated from AI/ML curricula, certifications & industry research (2025–2026)</span>
   </div>
 
   <h1>What you know about AI, and <em>where the map goes dark</em>.</h1>
@@ -408,11 +406,11 @@
   <div class="method">
     <div>
       <h4>How this was scored</h4>
-      <p>Evidence-based, not self-reported. 143 topics across 12 domains curated from NVIDIA DLI coursework, AWS AI Practitioner certification, OWASP/NIST/ISO frameworks, and current AI/ML research literature. A topic only reaches dark green with a shipped artifact, a debugging session that went past the surface, or a session where you taught it to someone else. Light green means you've reasoned about it correctly. Light red means surface-level exposure only. Red means no demonstrated knowledge.</p>
+      <p>Evidence-based, not self-reported. <span id="method-count"></span> topics across 12 domains curated from NVIDIA DLI coursework, AWS AI Practitioner certification, OWASP/NIST/ISO frameworks, and current AI/ML research literature. A topic only reaches dark green with a shipped artifact, a debugging session that went past the surface, or a session where you taught it to someone else. Light green means you've reasoned about it correctly. Light red means surface-level exposure only. Red means no demonstrated knowledge.</p>
     </div>
     <div>
       <h4>The known bias</h4>
-      <p>This maps what you demonstrated during the assessment. Work you did silently — at TRP, in personal projects, or in research you didn't reference — is invisible here and will be scored too low. Treat red cells in your own domain as prompts to provide evidence, not as verdicts.</p>
+      <p>This maps what was demonstrated during the assessment. Work done outside the assessment — in day jobs, personal projects, or research not referenced — is invisible here and will be scored too low. Treat red cells as prompts to provide evidence, not as verdicts.</p>
     </div>
     <div>
       <h4>Reading breadth vs depth</h4>
@@ -543,6 +541,8 @@ function renderHeatmap() {
   });
 
   document.getElementById('n-topics').textContent = `${total} topics`;
+  const mc = document.getElementById('method-count');
+  if (mc) mc.textContent = total;
 
   [4,3,2,1].forEach(l=>{
     const seg = document.createElement('div');
