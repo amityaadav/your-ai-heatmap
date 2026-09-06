@@ -69,15 +69,17 @@ The LLM receives the full list of remaining topics alongside the user's explanat
 - Design gold standard — quiz.html mirrors its visual style
 - **Score toggle**: if the viewer has localStorage quiz data, a toggle switches between Amit's scores and theirs
 - **Topic retake**: clicking a cell shows a "Retake this topic" link that opens `quiz.html?retake=TopicName`
+- **Learning resources**: the detail rail shows 2 free, credible learning links per topic sourced from the profile's `resources` field
 
 ### `assets/data/amit-profile.json` — Canonical Profile
 - Amit's pre-scored profile in the same JSON format as quiz export: `{profileName, exportedAt, totalTopics, evaluatedCount, domainNotes, domains}`
 - Editable directly on GitHub — update a score, push, and the dashboard reflects it on next page load
 - `domainNotes` is a lightweight extension (domain → note string) for the dashboard's per-domain commentary
+- Each topic includes a `resources` array of `{title, url}` objects pointing to free, credible learning materials
 
 ### `assets/js/data.js` — Shared Data
-- Contains the `DOMAINS` array (143 topics across 12 domains) used by `quiz.html`
-- Each topic: `[name, level, reasoning, evidence]`
+- Contains the `DOMAINS` array (148 topics across 12 domains) used by `quiz.html`
+- Each topic: `[name, level, reasoning, evidence, resources]`
 
 ## Container (`Dockerfile`)
 - Python 3.12 base image
