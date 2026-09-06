@@ -19,9 +19,8 @@ The project has two tiers: a **FastAPI backend** that evaluates user responses v
 
 ## Deployment
 
-Two deploy targets, each triggered on push to `main`:
+Triggered on push to `main`:
 
-- **GitHub Pages** (`.github/workflows/pages.yml`) — publishes `index.html`, `quiz.html`, and `assets/` as static files. The quiz's `/evaluate` endpoint needs the backend below, so quiz scoring won't work from Pages alone.
 - **Google Cloud Run** (`.github/workflows/deploy-cloudrun.yml`) — builds a Docker image in the GitHub Actions runner, pushes to Artifact Registry, and deploys to Cloud Run. This is the full app (backend + static files). Cloud Run scales to zero when idle, staying within the free tier for low traffic.
 
 Authentication from GitHub Actions to GCP uses **Workload Identity Federation** (keyless — no service account JSON key needed).
@@ -104,7 +103,6 @@ your-ai-heatmap/
 │   └── .env.example        # Config template for LLM backend selection
 ├── .github/
 │   └── workflows/
-│       ├── pages.yml           # GitHub Pages deploy (static files only)
 │       └── deploy-cloudrun.yml # Cloud Run deploy (full app)
 ├── .gitlab-ci.yml          # Legacy GitLab Pages mirror (inactive)
 ├── ARCHITECTURE.md
