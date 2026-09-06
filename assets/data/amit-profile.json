@@ -1,8 +1,8 @@
 {
   "profileName": "Amit Yadav",
   "exportedAt": "2026-08-03T00:00:00.000Z",
-  "totalTopics": 143,
-  "evaluatedCount": 143,
+  "totalTopics": 148,
+  "evaluatedCount": 148,
   "domainNotes": {
     "Foundations & model internals": "Strong for a non-ML-engineer — the NVIDIA labs did real work here.",
     "Training & model adaptation": "Transfer learning is genuinely strong; the LLM-adaptation half is nearly blank.",
@@ -299,6 +299,16 @@
         "score": 2,
         "reasoning": "Read about 8-hour agent workflows. Your own agents run in minutes.",
         "evidence": "Trends reading"
+      },
+      "Computer use & browser agents": {
+        "score": 1,
+        "reasoning": "Agents driving GUIs directly — Claude computer use, browser-use libraries. Distinct from tool-calling. Not discussed.",
+        "evidence": ""
+      },
+      "MCP registries & discovery": {
+        "score": 2,
+        "reasoning": "The ecosystem layer above the protocol — how clients find and trust servers. You know the protocol deeply but haven't engaged with the registry problem.",
+        "evidence": "Adjacent to MCP work"
       }
     },
     "Context & interaction engineering": {
@@ -341,6 +351,11 @@
         "score": 2,
         "reasoning": "You reason about token cost at the model-selection level, not the cache level.",
         "evidence": "Adjacent knowledge"
+      },
+      "Structured generation & constrained decoding": {
+        "score": 1,
+        "reasoning": "Grammar-guided generation at decode time — Outlines, Instructor, JSON mode. Distinct from validating outputs after the fact. Not discussed.",
+        "evidence": ""
       }
     },
     "Evaluation & reliability": {
@@ -537,6 +552,11 @@
         "score": 2,
         "reasoning": "Noted that Gemma 4 12B runs in 16GB with vision and voice. Interest, not practice.",
         "evidence": "Trends reading"
+      },
+      "Prompt routing & model cascades": {
+        "score": 2,
+        "reasoning": "Semantic routers, cost-aware cascades with fallback chains. Goes beyond your model-routing work into runtime dispatch patterns.",
+        "evidence": "Adjacent to TCO study"
       }
     },
     "Modalities beyond text": {
@@ -588,6 +608,11 @@
       "Audio & music generation": {
         "score": 1,
         "reasoning": "Never discussed.",
+        "evidence": ""
+      },
+      "Voice-native agents": {
+        "score": 1,
+        "reasoning": "Real-time voice APIs as a first-class agent interface — not STT+TTS glued together. A distinct pattern from your scaffold work.",
         "evidence": ""
       }
     },

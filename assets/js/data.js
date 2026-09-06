@@ -75,7 +75,9 @@ const DOMAINS = [
       ["Human-in-the-loop design",3,"You argue for review gates on risky actions and understand why bounded tasks beat open-ended chat.","Trends conversation, applied thinking"],
       ["Agent identity & permission scoping",2,"You've named agent identity sprawl as a threat. You haven't designed a scoping model.","AMA security prep"],
       ["Agent-to-agent protocols",1,"A2A and the coordination-protocol layer haven't come up.",""],
-      ["Long-horizon task execution",2,"Read about 8-hour agent workflows. Your own agents run in minutes.","Trends reading"]
+      ["Long-horizon task execution",2,"Read about 8-hour agent workflows. Your own agents run in minutes.","Trends reading"],
+      ["Computer use & browser agents",1,"Agents driving GUIs directly — Claude computer use, browser-use libraries. Distinct from tool-calling. Not discussed.",""],
+      ["MCP registries & discovery",2,"The ecosystem layer above the protocol — how clients find and trust servers. You know the protocol deeply but haven't engaged with the registry problem.","Adjacent to MCP work"]
     ]
   },
   {
@@ -89,7 +91,8 @@ const DOMAINS = [
       ["Prompt libraries & reuse",3,"Actively building a living library tied to real TRP artifacts. That's the right instinct and it's in flight.","In progress at TRP"],
       ["Structured outputs & schema validation",2,"Called out as a gap: structured output validation with repair loops. Still open.","Named gap"],
       ["Prompt versioning as tested artifacts",2,"Same assessment, same status. Treating prompts as code you regression-test hasn't started.","Named gap"],
-      ["Prompt caching & cost optimisation",2,"You reason about token cost at the model-selection level, not the cache level.","Adjacent knowledge"]
+      ["Prompt caching & cost optimisation",2,"You reason about token cost at the model-selection level, not the cache level.","Adjacent knowledge"],
+      ["Structured generation & constrained decoding",1,"Grammar-guided generation at decode time — Outlines, Instructor, JSON mode. Distinct from validating outputs after the fact. Not discussed.",""]
     ]
   },
   {
@@ -145,7 +148,8 @@ const DOMAINS = [
       ["API gateway patterns",3,"You mapped AgentCore Gateway onto TRP's existing Apigee layer unprompted — that's the architect move.","AgentCore training"],
       ["LLMOps platforms & model registry",1,"Never discussed. No model versioning, promotion, or registry practice.",""],
       ["Feature stores & ML pipelines",1,"Never discussed.",""],
-      ["Edge & on-device inference",2,"Noted that Gemma 4 12B runs in 16GB with vision and voice. Interest, not practice.","Trends reading"]
+      ["Edge & on-device inference",2,"Noted that Gemma 4 12B runs in 16GB with vision and voice. Interest, not practice.","Trends reading"],
+      ["Prompt routing & model cascades",2,"Semantic routers, cost-aware cascades with fallback chains. Goes beyond your model-routing work into runtime dispatch patterns.","Adjacent to TCO study"]
     ]
   },
   {
@@ -161,7 +165,8 @@ const DOMAINS = [
       ["Diffusion & image generation",2,"One row in one comparison table. Nothing beyond it.","Passing mention"],
       ["Video generation",1,"Never discussed beyond naming Sora once.",""],
       ["OCR & document AI",2,"Receipt scanning was an agent in the expense concept, but the OCR itself was never the subject.","Adjacent"],
-      ["Audio & music generation",1,"Never discussed.",""]
+      ["Audio & music generation",1,"Never discussed.",""],
+      ["Voice-native agents",1,"Real-time voice APIs as a first-class agent interface — not STT+TTS glued together. A distinct pattern from your scaffold work.",""]
     ]
   },
   {
