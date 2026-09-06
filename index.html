@@ -617,8 +617,20 @@ function select(btn,name,lvl,why,ev,dom){
   show(name,lvl,why,ev,dom);
   if(window.innerWidth<=1080) rail.classList.add('open');
 }
-document.getElementById('railClose').addEventListener('click',()=>rail.classList.remove('open'));
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') rail.classList.remove('open'); });
+function deselect(){
+  document.querySelectorAll('.cell.sel').forEach(c=>c.classList.remove('sel'));
+  rTitle.textContent = 'Pick a cell';
+  rBand.hidden = true;
+  rWhy.textContent = 'Every square carries the specific reason it landed where it did — what you built, what you only asked about, and what has never come up at all.';
+  rEv.innerHTML = '';
+  rRetake.hidden = true;
+  rail.classList.remove('open');
+}
+document.getElementById('railClose').addEventListener('click', deselect);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') deselect(); });
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.cell') && !e.target.closest('.rail')) deselect();
+});
 </script>
 </body>
 </html>
