@@ -494,6 +494,12 @@
     font-size:11px;
     color:var(--ink-3);
     flex:1;
+    line-height:1.5;
+  }
+  .save-indicator .privacy-note{
+    display:block;
+    font-size:10px;
+    opacity:.7;
   }
   .session-bar button{
     padding:6px 14px;
@@ -551,10 +557,7 @@
   <!-- ===== QUIZ MODE ===== -->
   <div id="quiz-mode">
     <div class="eyebrow">
-      <span>Knowledge quiz</span>
-      <span id="n-topics">143 topics</span>
-      <span>LLM-evaluated</span>
-      <a href="index.html" class="nav-link">View heatmap</a>
+      <a href="index.html" class="nav-link">← View heatmap</a>
     </div>
 
     <h1>What do you <em>actually</em> know?</h1>
@@ -613,12 +616,10 @@
   <!-- ===== FINAL REVEAL MODE ===== -->
   <div id="reveal-mode" class="hidden">
     <div class="eyebrow">
-      <span>Knowledge survey</span>
+      <a href="index.html" class="nav-link">← View heatmap</a>
       <span id="reveal-name">Your results</span>
       <span id="reveal-date"></span>
       <span id="reveal-count"></span>
-      <span>LLM-evaluated from your explanations</span>
-      <a href="index.html" class="nav-link">View original heatmap</a>
     </div>
 
     <div class="reveal-section">
@@ -751,7 +752,8 @@ function initQuiz() {
     }
   }
 
-  document.getElementById('n-topics').textContent = `${allTopics.length} topics`;
+  const nEl = document.getElementById('n-topics');
+  if (nEl) nEl.textContent = `${allTopics.length} topics`;
   updateProgress();
   updateSaveIndicator();
   showNextTopic();
@@ -1343,10 +1345,11 @@ function importProfile(event) {
 function updateSaveIndicator() {
   const el = document.getElementById('save-indicator');
   if (!el) return;
+  const privacy = '<span class="privacy-note">Stored in your browser only — never sent to a server</span>';
   if (evaluatedTopics.length > 0) {
-    el.textContent = `Progress saved — ${evaluatedTopics.length}/${allTopics.length} topics`;
+    el.innerHTML = `Progress saved — ${evaluatedTopics.length}/${allTopics.length} topics${privacy}`;
   } else {
-    el.textContent = 'No saved progress';
+    el.innerHTML = 'No saved progress' + privacy;
   }
 }
 
