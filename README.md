@@ -1,6 +1,6 @@
 # AI Knowledge Heatmap
 
-An interactive knowledge survey mapping 148 AI/ML topics across 12 domains,
+An interactive knowledge survey mapping 153 AI/ML topics across 12 domains,
 scored on a 4-level scale (untouched → heard of → can explain → built/taught)
 with evidence behind every cell and free learning resources for every topic.
 
