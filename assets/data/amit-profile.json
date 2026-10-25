@@ -1,8 +1,8 @@
 {
   "profileName": "Amit Yadav",
   "exportedAt": "2026-08-03T00:00:00.000Z",
-  "totalTopics": 148,
-  "evaluatedCount": 148,
+  "totalTopics": 153,
+  "evaluatedCount": 153,
   "domainNotes": {
     "Foundations & model internals": "Strong for a non-ML-engineer — the NVIDIA labs did real work here.",
     "Training & model adaptation": "Transfer learning is genuinely strong; the LLM-adaptation half is nearly blank.",
@@ -286,6 +286,25 @@
           {
             "title": "Hugging Face — Distillation guide",
             "url": "https://huggingface.co/docs/transformers/tasks/knowledge_distillation"
+          }
+        ]
+      },
+      "Diffusion LMs & non-transformer architectures (SSM/Mamba)": {
+        "score": 1,
+        "reasoning": "Alternatives to autoregressive transformers: state-space models, hybrids and diffusion language models. Research-stage (about 1B parameters); not yet discussed.",
+        "evidence": "",
+        "resources": [
+          {
+            "title": "Gu & Dao — Mamba",
+            "url": "https://arxiv.org/abs/2312.00752"
+          },
+          {
+            "title": "Nie et al. — LLaDA (diffusion LLM)",
+            "url": "https://arxiv.org/abs/2502.09992"
+          },
+          {
+            "title": "DiffuApriel — Diffusion LMs with Mamba backbone",
+            "url": "https://arxiv.org/abs/2511.15927"
           }
         ]
       }
@@ -879,6 +898,55 @@
             "url": "https://smithery.ai/"
           }
         ]
+      },
+      "Agent Skills & SKILL.md standard": {
+        "score": 1,
+        "reasoning": "Folder-based, progressively-loaded instructions (agentskills.io, Dec 2025) now supported by 40+ tools. Not yet explored, though it sits right next to your Claude Code and MCP work.",
+        "evidence": "",
+        "resources": [
+          {
+            "title": "Agent Skills — Open specification",
+            "url": "https://agentskills.io/"
+          },
+          {
+            "title": "Anthropic — Agent Skills overview",
+            "url": "https://docs.anthropic.com/en/docs/agents-and-tools/agent-skills/overview"
+          }
+        ]
+      },
+      "Agentic payments & commerce (AP2, ACP, x402)": {
+        "score": 1,
+        "reasoning": "Competing protocols for letting agents pay: AP2 signed mandates, ACP checkout, x402 HTTP 402. Hasn't come up, but it extends your agent identity and permission-scoping thinking into money.",
+        "evidence": "",
+        "resources": [
+          {
+            "title": "Google — AP2 (Agent Payments Protocol)",
+            "url": "https://github.com/google-agentic-commerce/AP2"
+          },
+          {
+            "title": "x402 — Payments protocol",
+            "url": "https://www.x402.org/"
+          },
+          {
+            "title": "Agentic Commerce Protocol (OpenAI & Stripe)",
+            "url": "https://github.com/agentic-commerce-protocol/agentic-commerce-protocol"
+          }
+        ]
+      },
+      "Persistent background agents & memory": {
+        "score": 1,
+        "reasoning": "Agents that keep pursuing goals between conversations and carry long-term memory. Not yet discussed; one source for the latest products is weak, so verify before relying on it.",
+        "evidence": "",
+        "resources": [
+          {
+            "title": "Packer et al. — MemGPT",
+            "url": "https://arxiv.org/abs/2310.08560"
+          },
+          {
+            "title": "Mem0 — Memory layer for AI agents",
+            "url": "https://github.com/mem0ai/mem0"
+          }
+        ]
       }
     },
     "Context & interaction engineering": {
@@ -1166,6 +1234,25 @@
           {
             "title": "Kadavath et al. — LLMs know what they know",
             "url": "https://arxiv.org/abs/2207.05221"
+          }
+        ]
+      },
+      "Agent time horizons, reward hacking & eval awareness": {
+        "score": 1,
+        "reasoning": "How long a task agents can complete, and how models game scoring or notice they are being tested. Goes beyond SWE-bench-style leaderboards; not yet discussed.",
+        "evidence": "",
+        "resources": [
+          {
+            "title": "METR — Measuring AI Ability to Complete Long Tasks",
+            "url": "https://arxiv.org/abs/2503.14499"
+          },
+          {
+            "title": "METR — Recent reward hacking",
+            "url": "https://metr.org/blog/2025-06-05-recent-reward-hacking/"
+          },
+          {
+            "title": "METR — Research",
+            "url": "https://metr.org/research/"
           }
         ]
       }

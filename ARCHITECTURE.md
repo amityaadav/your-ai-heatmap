@@ -78,7 +78,7 @@ The LLM receives the full list of remaining topics alongside the user's explanat
 - Each topic includes a `resources` array of `{title, url}` objects pointing to free, credible learning materials
 
 ### `assets/js/data.js` — Shared Data
-- Contains the `DOMAINS` array (148 topics across 12 domains) used by `quiz.html`
+- Contains the `DOMAINS` array (153 topics across 12 domains) used by `quiz.html`
 - Each topic: `[name, level, reasoning, evidence, resources]`
 
 ## Container (`Dockerfile`)
@@ -96,7 +96,7 @@ your-ai-heatmap/
 │   ├── data/
 │   │   └── amit-profile.json  # Amit's scores (canonical, editable on GitHub)
 │   └── js/
-│       └── data.js            # 148 topics shared between index.html and quiz.html
+│       └── data.js            # 153 topics shared between index.html and quiz.html
 ├── backend/
 │   ├── main.py             # FastAPI app (serves API + static files)
 │   ├── sensing_engine.py   # LLM evaluator (Ollama Cloud / OpenRouter / local)
